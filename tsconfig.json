@@ -1,0 +1,25 @@
+{
+	"compilerOptions":{
+		"module":"commonjs",
+		"declaration":true,
+		"removeComments":true,
+		"emitDecoratorMetadata":true,
+		"experimentalDecorators":true,
+		"target":"es2020",
+		"sourceMap":true,
+		"outDir":"./dist",
+		"baseUrl":"./",
+		"lib": ["es2020", "esnext"],
+		"esModuleInterop":true,
+		"incremental":true,
+		"plugins":[
+			{
+				"name":"typescript-eslint-language-service"
+			}
+		]
+	},
+	"exclude":[
+		"node_modules",
+		"dist"
+	]
+}
