@@ -1,4 +1,4 @@
-export default = {
+export default {
   chainId: 'Test-Denali',
   lcdUrl: 'http://142.93.65.220:1317',
   Bech32Prefix: 'idep',
