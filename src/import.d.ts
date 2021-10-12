@@ -1,6 +1,6 @@
 //declare module 'bech32';
 declare module 'crypto-js';
-declare module 'crypto-js/ripemd160';
+declare module 'ripemd160-js';
 declare module 'uuid';
 declare module 'elliptic';
 declare module 'secp256k1';
