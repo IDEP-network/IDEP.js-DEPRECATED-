@@ -32,13 +32,55 @@ export interface AbciQueryRequest {
 }
 
 export interface AbciQueryResponse {
-  response: AbciQueryResponseValue;
-  query: AbciQuery;
+ response: AbciQueryResponseValue;
+ query: AbciQuery;
 }
 
 export interface AbciQueryResponseValue {
-  value: string;
-  code: number;
-  log: string;
-  codespace: string;
+ value: string;
+ code: number;
+ log: string;
+ codespace: string;
+}
+
+export interface Coin {
+ denom: string;
+ amount: string;
+}
+
+export interface StdFee {
+ amount: Coin[];
+ gas: string;
+}
+
+export interface Message {
+ type: string;
+ value: any;
+}
+
+export interface TxSignatureMeta {
+ accountNumber: string;
+ chainId: string;
+ sequence: string;
+}
+
+export interface StdMessageSignature extends TxSignatureMeta {
+ fee: StdFee
+ memo: string;
+ messages: Message[]
+}
+
+export interface StdSignature {
+ signature: any;
+ publicKey: any;
+}
+
+export interface Tx {
+ message: Message[];
+ fee: StdFee;
+ memo: string;
+}
+
+export interface StdTx extends Tx {
+ signatures: StdSignature[];
 }

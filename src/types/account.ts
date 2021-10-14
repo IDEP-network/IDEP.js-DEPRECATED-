@@ -1,14 +1,18 @@
 export interface KeyPair {
-  private: string | Buffer | Uint8Array;
-  public: string | Buffer | Uint8Array;
+ private:  Buffer;
+ public: Buffer;
 }
 
 export interface Wallet {
-  keys: KeyPair;
-  address: string;
+ keys: KeyPair;
+ address: string;
+ mnemonic: any;
 }
 
 export interface KeyRing {
- Keys: KeyPair[]
+ Keys: KeyPair[];
+ write(name: string, key: Wallet): void;
+ read(name: string): Wallet;
+
  // add things
 }
