@@ -42,4 +42,24 @@ describe('Crypto module', () => {
     const stringAgain = crypto.bufferToString(buffer, 'utf8');
     expect(stringAgain).toEqual('test string');
   });
+  it('PBKDF2 works fine', async () => {
+    const pwd = 'randompwd';
+    const salt = cryptoJs.lib.WordArray.random(128 / 8);
+    const key = await crypto.pbkdf2(pwd, salt);
+    console.log(key);
+    console.log(key.toString(cryptoJs.enc.Hex));
+  });
+  it('Aes  encrypt works', async () => {
+    const pwd = 'randompwd';
+    const msg = 'test message';
+    const encrypted = await crypto.aesEncrypt(msg, pwd);
+    console.log(encrypted);
+  });
+  it('Decrypt works  too', async () => {
+    const pwd = 'randompwd';
+    const msg = 'test message';
+    const encrypted = await crypto.aesEncrypt(msg, pwd);
+    const decrypted = await crypto.aesDecrypt(encrypted, pwd);
+    console.log(decrypted);
+  });
 });
