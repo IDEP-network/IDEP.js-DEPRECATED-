@@ -13,7 +13,7 @@ import {
  toCanonicalJSONBytes
 } from '@tendermint/belt';
 import { KeyPair } from '../types/account';
-import { TxSignatureMeta, StdTx } from '../types/types'
+import {AesEncryptedPhrase, StdTx, TxSignatureMeta} from '../types/types';
 let { bech32 } = require('bech32');
 
 export const getRandomBytes = (length: number): Promise<Buffer> => {
@@ -39,20 +39,49 @@ export const generateMnemonic = async (): Promise<string> => {
  return bip39.entropyToMnemonic(randomBytes.toString('hex'));
 };
 
-export const pbkdf2 = (salt, password) => {
- const key512Bits1000Iterations = cryptoJs.PBKDF2(password, salt, { keySize: 512 / 32, iterations: 1000 });
- return key512Bits1000Iterations;
-}
+export const pbkdf2 = async (password, salt) => {
+  const key512Bits1000Iterations = await cryptoJs.PBKDF2(password, salt, {
+    keySize: 256 / 32,
+    iterations: 1000,
+  });
+  return key512Bits1000Iterations;
+};
 
-export const aesEncrypt = (msg, pwd) => cryptoJs.AES.encrypt(msg, pwd);
-
-export const aesDecrypt = (msg, pwd) => cryptoJs.AES.decrypt(msg, pwd);
+export const aesEncrypt = async (msg, pwd) => {
+  const iv = await getRandomBytes(16);
+  const salt = cryptoJs.lib.WordArray.random(128 / 8);
+  const key = await pbkdf2(pwd, salt);
+  const parsedKey = key.words.toString(cryptoJs.enc.Base64);
+  console.log(parsedKey);
+  console.log(salt);
+  const encrypted = cryptoJs.AES.encrypt(msg, parsedKey, {
+    mode: cryptoJs.mode.CTR,
+    iv: iv,
+  });
+  const encryptedPhrase: AesEncryptedPhrase = {
+    cipherText: encrypted.ciphertext.toString(cryptoJs.enc.Hex),
+    iv: encrypted.iv.toString(cryptoJs.enc.Hex),
+    salt: salt.toString(cryptoJs.enc.Hex),
+  };
+  return encryptedPhrase;
+};
 
 export const generateMasterKeyFromMnemonic = async (mnemonic: string): Promise<any> => {
  // throws if mnemonic is invalid
  if (!bip39.validateMnemonic(mnemonic)) {
   throw new Error('Invalid mnemonic format'); // TO-DO custom error type
  }
+export const aesDecrypt = async (msg, pwd) => {
+  const key = await pbkdf2(pwd, msg.salt);
+  const parsedKey = key.words.toString(cryptoJs.enc.Base64);
+  const iv = cryptoJs.enc.Hex.parse(msg.iv);
+  const cipherText = cryptoJs.lib.CipherParams.create({
+    ciphertext: cryptoJs.enc.Hex.parse(msg.cipherText),
+  });
+  const decrypted = cryptoJs.AES.decrypt(cipherText, parsedKey, { iv });
+  console.log(decrypted);
+  return decrypted.toString(cryptoJs.enc.Utf8);
+};
 
  const seed = await bip39.mnemonicToSeed(mnemonic);
  return bip32.fromSeed(seed);
