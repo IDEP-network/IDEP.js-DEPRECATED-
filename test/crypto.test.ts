@@ -1,3 +1,5 @@
+import * as cryptoJs from 'crypto-js';
+
 import * as crypto from '../src/utils/crypto';
 
 describe('Crypto module', () => {
