@@ -53,10 +53,6 @@ export const aesEncrypt = async (msg, pwd) => {
   const iv = CryptoJS.enc.Hex.parse(randomBytes.toString('hex'));
   const salt = CryptoJS.lib.WordArray.random(128 / 8);
   const key = pbkdf2(pwd, salt);
-  console.log(iv.toString(CryptoJS.enc.Hex).length);
-  console.log(iv);
-  console.log(key);
-  console.log(key.toString(CryptoJS.enc.Hex).length);
   const encrypted = CryptoJS.AES.encrypt(msg, key, {
     mode: CryptoJS.mode.CTR,
     iv: iv,
@@ -81,7 +77,6 @@ export const aesDecrypt = async (msg, pwd) => {
     iv,
     padding: CryptoJS.pad.NoPadding,
   });
-  console.log(decrypted);
   return decrypted.toString(CryptoJS.enc.Latin1);
 };
 export const generateMasterKeyFromMnemonic = async (
