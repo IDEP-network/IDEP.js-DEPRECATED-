@@ -1,6 +1,6 @@
-import * as cryptoJs from 'crypto-js';
-
 import * as crypto from '../src/utils/crypto';
+
+const CryptoJS = require('crypto-js') as typeof import('crypto-js');
 
 describe('Crypto module', () => {
   it('getRandomBytes returns correct number of bytes', async () => {
@@ -46,10 +46,10 @@ describe('Crypto module', () => {
   });
   it('PBKDF2 works fine', async () => {
     const pwd = 'randompwd';
-    const salt = cryptoJs.lib.WordArray.random(128 / 8);
+    const salt = CryptoJS.lib.WordArray.random(128 / 8);
     const key = await crypto.pbkdf2(pwd, salt);
     console.log(key);
-    console.log(key.toString(cryptoJs.enc.Hex));
+    console.log(key.toString(CryptoJS.enc.Hex));
   });
   it('Aes  encrypt works', async () => {
     const pwd = 'randompwd';
@@ -63,5 +63,6 @@ describe('Crypto module', () => {
     const encrypted = await crypto.aesEncrypt(msg, pwd);
     const decrypted = await crypto.aesDecrypt(encrypted, pwd);
     console.log(decrypted);
+    expect(decrypted).toEqual('test message');
   });
 });

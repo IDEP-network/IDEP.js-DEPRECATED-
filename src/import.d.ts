@@ -1,3 +1,4 @@
+/*
 //declare module 'bech32';
 declare module 'crypto-js';
 declare module 'ripemd160-js';
@@ -9,3 +10,4 @@ declare module 'bip39';
 declare module 'crypto';
 
 declare var window: Window & typeof globalThis;
+*/
