@@ -92,11 +92,12 @@ export const generateMasterKeyFromMnemonic = async (
 };
 
 export const generatePrivateKeyFromMnemonic = async (
-  mnemonic: string
+  mnemonic: string,
+  hdPath: string = config.hdPath
 ): Promise<Buffer> => {
   const masterKey = await generateMasterKeyFromMnemonic(mnemonic);
 
-  const child = masterKey.derivePath(config.hdPath); // not sure about this line yet
+  const child: BIP32Interface = masterKey.derivePath(hdPath); // not sure about this line yet
   return child.privateKey;
 };
 
