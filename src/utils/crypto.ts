@@ -1,10 +1,11 @@
 //import {base64ToBytes, bytesToBase64, toCanonicalJSONBytes} from '@tendermint/belt';
-import { bech32 } from 'bech32';
-import { sha256 } from 'js-sha256';
+import {bech32} from 'bech32';
+import {BIP32Interface} from 'bip32';
+import {sha256} from 'js-sha256';
 
-import { KeyPair } from '../types/account';
-import { AesEncryptedPhrase, StdTx, TxSignatureMeta } from '../types/types';
-import { config } from './config';
+import {KeyPair} from '../types/account';
+import {AesEncryptedPhrase, StdSignature, StdTx, TxSignatureMeta} from '../types/types';
+import {config} from './config';
 
 const bip32 = require('bip32') as typeof import('bip32');
 const bip39 = require('bip39') as typeof import('bip39');
