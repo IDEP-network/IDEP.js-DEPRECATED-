@@ -1,10 +1,10 @@
 //import {base64ToBytes, bytesToBase64, toCanonicalJSONBytes} from '@tendermint/belt';
-import {bech32} from 'bech32';
-import {sha256} from 'js-sha256';
+import { bech32 } from 'bech32';
+import { sha256 } from 'js-sha256';
 
-import {KeyPair} from '../types/account';
-import {AesEncryptedPhrase, StdTx, TxSignatureMeta} from '../types/types';
-import {config} from './config';
+import { KeyPair } from '../types/account';
+import { AesEncryptedPhrase, StdTx, TxSignatureMeta } from '../types/types';
+import { config } from './config';
 
 const bip32 = require('bip32') as typeof import('bip32');
 const bip39 = require('bip39') as typeof import('bip39');
@@ -139,12 +139,14 @@ export const createMessageSignature = (
   if (typeof privateKey === 'string') {
     privateKey = Buffer.from(privateKey);
   }
-  const hashedMessage = Buffer.from(
-    sha256(messageSignFormat).toString(),
-    'hex'
-  );
+  //const msgInBytesFormat = tendermintBelt.toCanonicalJSONBytes(signMsg);
+  const hashedMessage = sha256.array(messageSignFormat);
+  const msgUintArr = new Uint8Array(hashedMessage);
 
-  const { signature } = secp256k1.ecdsaSign(hashedMessage, privateKey);
+  const { signature } = secp256k1.ecdsaSign(
+    msgUintArr,
+    new Uint8Array(privateKey)
+  );
   return signature;
 };
 
@@ -153,7 +155,6 @@ export const createSignedMessageBytes = (
   privateKey: Buffer
 ): Uint8Array => {
   const msgInBytesFormat = tendermintBelt.toCanonicalJSONBytes(signMsg);
-
   return hashAndSignBytesWithPrivateKey(msgInBytesFormat, privateKey);
 };
 
@@ -161,8 +162,10 @@ export const hashAndSignBytesWithPrivateKey = (
   bytes: Buffer | Uint8Array,
   key: Buffer
 ): Uint8Array => {
-  const hash = Buffer.from(sha256(bytes));
-  const { signature } = secp256k1.ecdsaSign(hash, key);
+  const hash = sha256.array(bytes);
+  const uintArr = new Uint8Array(hash);
+  const uintArrFormatedKey = new Uint8Array(key);
+  const { signature } = secp256k1.ecdsaSign(uintArr, uintArrFormatedKey);
   return signature;
 };
 
@@ -206,14 +209,17 @@ export const signTx = (
 
 export const verifySignedBytes = (signMsg, signature, pubKey): boolean => {
   const bytes = tendermintBelt.toCanonicalJSONBytes(signMsg);
-  const hash = Buffer.from(sha256(bytes));
+  const hash = sha256.array(bytes);
+  const uintArr = new Uint8Array(hash);
 
-  return secp256k1.ecdsaVerify(signature, hash, pubKey);
+  return secp256k1.ecdsaVerify(signature, uintArr, pubKey);
 };
 
-const verifySingleSignature = (signMsg, signature): boolean => {
+export const verifySingleSignature = (signMsg, signature): boolean => {
   const signedBytes = tendermintBelt.base64ToBytes(signature.signature);
-  const pubKey = tendermintBelt.base64ToBytes(signature.publicKey);
+  const pubKey = tendermintBelt.base64ToBytes(
+    signature.publicKey?.value || signature.publicKey
+  );
 
   return verifySignedBytes(signMsg, signedBytes, pubKey);
 };
@@ -233,7 +239,6 @@ export const verifyTxSignatures = (signMsg, signatures): boolean => {
 
 export const verifyTx = (tx: StdTx, meta: TxSignatureMeta): boolean => {
   const signMsg = createSignMsg(tx, meta);
-
   return verifyTxSignatures(signMsg, tx.signatures);
 };
 
