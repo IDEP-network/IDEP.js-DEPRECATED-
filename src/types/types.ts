@@ -81,7 +81,7 @@ export interface Tx {
 }
 
 export interface StdTx extends Tx {
-  signatures: StdSignature[];
+  signatures?: StdSignature[];
 }
 
 export interface AesEncryptedPhrase {
