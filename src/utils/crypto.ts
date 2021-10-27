@@ -40,7 +40,7 @@ export const generateMnemonic = async (): Promise<string> => {
   return bip39.entropyToMnemonic(randomBytes.toString('hex'));
 };
 
-export const pbkdf2 = (password, salt) => {
+export const pbkdf2 = (password, salt): CryptoJS.lib.WordArray => {
   const key = CryptoJS.enc.Utf8.parse(password);
   const key512Bits1000Iterations = CryptoJS.PBKDF2(key, salt, {
     keySize: 256 / 8,
@@ -49,7 +49,7 @@ export const pbkdf2 = (password, salt) => {
   return key512Bits1000Iterations;
 };
 
-export const aesEncrypt = async (msg, pwd) => {
+export const aesEncrypt = async (msg, pwd): Promise<AesEncryptedPhrase> => {
   const randomBytes = await getRandomBytes(12);
   const iv = CryptoJS.enc.Hex.parse(randomBytes.toString('hex'));
   const salt = CryptoJS.lib.WordArray.random(128 / 8);
@@ -67,7 +67,7 @@ export const aesEncrypt = async (msg, pwd) => {
   return encryptedPhrase;
 };
 
-export const aesDecrypt = async (msg, pwd) => {
+export const aesDecrypt = async (msg: AesEncryptedPhrase, pwd: string): Promise<string> => {
   const key = pbkdf2(pwd, CryptoJS.enc.Hex.parse(msg.salt));
   const iv = CryptoJS.enc.Hex.parse(msg.iv);
   const cipherText = CryptoJS.lib.CipherParams.create({
@@ -82,12 +82,12 @@ export const aesDecrypt = async (msg, pwd) => {
 };
 export const generateMasterKeyFromMnemonic = async (
   mnemonic: string
-): Promise<any> => {
+): Promise<BIP32Interface> => {
   // throws if mnemonic is invalid
   if (!bip39.validateMnemonic(mnemonic)) {
     throw new Error('Invalid mnemonic format'); // TO-DO custom error type
   }
-  const seed = await bip39.mnemonicToSeed(mnemonic);
+  const seed: Buffer = await bip39.mnemonicToSeed(mnemonic);
   return bip32.fromSeed(seed);
 };
 
@@ -170,7 +170,7 @@ export const hashAndSignBytesWithPrivateKey = (
   return signature;
 };
 
-export const generateSignature = (signMsg, keys: KeyPair) => {
+export const generateSignature = (signMsg, keys: KeyPair):  StdSignature => {
   const { private: privKey, public: pubKey } = keys;
   const signedMsgBytes = createSignedMessageBytes(signMsg, privKey);
 
