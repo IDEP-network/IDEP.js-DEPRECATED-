@@ -26,6 +26,17 @@ export const getRandomBytes = (length: number): Promise<Buffer> => {
   });
 };
 
+export const nativePbkdf2 = (password, salt): Promise<Buffer> => {
+  return new Promise((resolve, reject) => {
+    //   if (password.length % 4)
+    const key = Buffer.from(password);
+    crypto.pbkdf2(key, salt, 100000, 256 / 8, 'sha512', (err, derivedKey) => {
+      if (err) reject(err);
+      else resolve(derivedKey);
+    });
+  });
+};
+
 export const encodeIntoBech32Format = (
   hashedAddress: Buffer,
   prefix: string = config.Bech32Prefix
@@ -45,8 +56,27 @@ export const pbkdf2 = (password, salt): CryptoJS.lib.WordArray => {
   const key512Bits1000Iterations = CryptoJS.PBKDF2(key, salt, {
     keySize: 256 / 8,
     iterations: 1000,
+    hasher: CryptoJS.algo.SHA512,
   });
   return key512Bits1000Iterations;
+};
+
+export const aesEncryptNative = async (msg, pwd) => {
+  const nonce = await getRandomBytes(12);
+  const salt = await getRandomBytes(16);
+  const key = await nativePbkdf2(pwd, salt);
+  // aes-ctr is just ok with12 bytes, but we need to pad at the end to get required 16 bytes
+  const iv = Buffer.concat([nonce, Buffer.alloc(4, 0)]);
+
+  let cipher = crypto.createCipheriv('aes-256-ctr', key, iv);
+  const encrypted =
+    cipher.update(msg.toString(), 'utf8', 'hex') + cipher.final('hex');
+  const encryptedPhrase: AesEncryptedPhrase = {
+    cipherText: encrypted,
+    iv: iv.toString('hex'),
+    salt: salt.toString('hex'),
+  };
+  return encryptedPhrase;
 };
 
 export const aesEncrypt = async (msg, pwd): Promise<AesEncryptedPhrase> => {
@@ -60,18 +90,29 @@ export const aesEncrypt = async (msg, pwd): Promise<AesEncryptedPhrase> => {
     padding: CryptoJS.pad.NoPadding,
   });
   const encryptedPhrase: AesEncryptedPhrase = {
-    cipherText: encrypted.ciphertext.toString(CryptoJS.enc.Base64),
+    cipherText: encrypted.ciphertext.toString(CryptoJS.enc.Hex),
     iv: encrypted.iv.toString(CryptoJS.enc.Hex),
     salt: salt.toString(CryptoJS.enc.Hex),
   };
   return encryptedPhrase;
 };
 
-export const aesDecrypt = async (msg: AesEncryptedPhrase, pwd: string): Promise<string> => {
+export const aesDecryptNative = async (msg, pwd) => {
+  const key = await nativePbkdf2(pwd, Buffer.from(msg.salt, 'hex'));
+  let iv = Buffer.from(msg.iv, 'hex');
+  let decipher = crypto.createDecipheriv('aes-256-ctr', key, iv);
+  const decrypted =
+    decipher.update(msg.cipherText, 'hex', 'utf8') + decipher.final('utf8');
+  return decrypted;
+};
+export const aesDecrypt = async (
+  msg: AesEncryptedPhrase,
+  pwd: string
+): Promise<string> => {
   const key = pbkdf2(pwd, CryptoJS.enc.Hex.parse(msg.salt));
   const iv = CryptoJS.enc.Hex.parse(msg.iv);
   const cipherText = CryptoJS.lib.CipherParams.create({
-    ciphertext: CryptoJS.enc.Base64.parse(msg.cipherText),
+    ciphertext: CryptoJS.enc.Hex.parse(msg.cipherText),
   });
   const decrypted = CryptoJS.AES.decrypt(cipherText, key, {
     mode: CryptoJS.mode.CTR,
