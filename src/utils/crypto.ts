@@ -6,6 +6,7 @@ import {sha256} from 'js-sha256';
 import {KeyPair} from '../types/account';
 import {AesEncryptedPhrase, StdSignature, StdTx, TxSignatureMeta} from '../types/types';
 import {config} from './config';
+import { Cipher, Decipher } from 'crypto';
 
 const bip32 = require('bip32') as typeof import('bip32');
 const bip39 = require('bip39') as typeof import('bip39');
@@ -26,7 +27,7 @@ export const getRandomBytes = (length: number): Promise<Buffer> => {
   });
 };
 
-export const nativePbkdf2 = (password, salt): Promise<Buffer> => {
+export const pbkdf2 = (password: string, salt: Buffer): Promise<Buffer> => {
   return new Promise((resolve, reject) => {
     //   if (password.length % 4)
     const key = Buffer.from(password);
@@ -51,25 +52,18 @@ export const generateMnemonic = async (): Promise<string> => {
   return bip39.entropyToMnemonic(randomBytes.toString('hex'));
 };
 
-export const pbkdf2 = (password, salt): CryptoJS.lib.WordArray => {
-  const key = CryptoJS.enc.Utf8.parse(password);
-  const key512Bits1000Iterations = CryptoJS.PBKDF2(key, salt, {
-    keySize: 256 / 8,
-    iterations: 1000,
-    hasher: CryptoJS.algo.SHA512,
-  });
-  return key512Bits1000Iterations;
-};
-
-export const aesEncryptNative = async (msg, pwd) => {
-  const nonce = await getRandomBytes(12);
-  const salt = await getRandomBytes(16);
-  const key = await nativePbkdf2(pwd, salt);
+export const aesEncrypt = async (
+  msg: string,
+  pwd: string
+): Promise<AesEncryptedPhrase> => {
+  const nonce: Buffer = await getRandomBytes(12);
+  const salt: Buffer = await getRandomBytes(16);
+  const key: Buffer = await pbkdf2(pwd, salt);
   // aes-ctr is just ok with12 bytes, but we need to pad at the end to get required 16 bytes
-  const iv = Buffer.concat([nonce, Buffer.alloc(4, 0)]);
+  const iv: Buffer = Buffer.concat([nonce, Buffer.alloc(4, 0)]);
 
-  let cipher = crypto.createCipheriv('aes-256-ctr', key, iv);
-  const encrypted =
+  let cipher: Cipher = crypto.createCipheriv('aes-256-ctr', key, iv);
+  const encrypted: string =
     cipher.update(msg.toString(), 'utf8', 'hex') + cipher.final('hex');
   const encryptedPhrase: AesEncryptedPhrase = {
     cipherText: encrypted,
@@ -79,47 +73,16 @@ export const aesEncryptNative = async (msg, pwd) => {
   return encryptedPhrase;
 };
 
-export const aesEncrypt = async (msg, pwd): Promise<AesEncryptedPhrase> => {
-  const randomBytes = await getRandomBytes(12);
-  const iv = CryptoJS.enc.Hex.parse(randomBytes.toString('hex'));
-  const salt = CryptoJS.lib.WordArray.random(128 / 8);
-  const key = pbkdf2(pwd, salt);
-  const encrypted = CryptoJS.AES.encrypt(msg, key, {
-    mode: CryptoJS.mode.CTR,
-    iv: iv,
-    padding: CryptoJS.pad.NoPadding,
-  });
-  const encryptedPhrase: AesEncryptedPhrase = {
-    cipherText: encrypted.ciphertext.toString(CryptoJS.enc.Hex),
-    iv: encrypted.iv.toString(CryptoJS.enc.Hex),
-    salt: salt.toString(CryptoJS.enc.Hex),
-  };
-  return encryptedPhrase;
-};
-
-export const aesDecryptNative = async (msg, pwd) => {
-  const key = await nativePbkdf2(pwd, Buffer.from(msg.salt, 'hex'));
-  let iv = Buffer.from(msg.iv, 'hex');
-  let decipher = crypto.createDecipheriv('aes-256-ctr', key, iv);
-  const decrypted =
-    decipher.update(msg.cipherText, 'hex', 'utf8') + decipher.final('utf8');
-  return decrypted;
-};
 export const aesDecrypt = async (
   msg: AesEncryptedPhrase,
   pwd: string
 ): Promise<string> => {
-  const key = pbkdf2(pwd, CryptoJS.enc.Hex.parse(msg.salt));
-  const iv = CryptoJS.enc.Hex.parse(msg.iv);
-  const cipherText = CryptoJS.lib.CipherParams.create({
-    ciphertext: CryptoJS.enc.Hex.parse(msg.cipherText),
-  });
-  const decrypted = CryptoJS.AES.decrypt(cipherText, key, {
-    mode: CryptoJS.mode.CTR,
-    iv,
-    padding: CryptoJS.pad.NoPadding,
-  });
-  return decrypted.toString(CryptoJS.enc.Latin1);
+  const key: Buffer = await pbkdf2(pwd, Buffer.from(msg.salt, 'hex'));
+  let iv: Buffer = Buffer.from(msg.iv, 'hex');
+  let decipher: Decipher = crypto.createDecipheriv('aes-256-ctr', key, iv);
+  const decrypted: string =
+    decipher.update(msg.cipherText, 'hex', 'utf8') + decipher.final('utf8');
+  return decrypted;
 };
 export const generateMasterKeyFromMnemonic = async (
   mnemonic: string
@@ -212,7 +175,7 @@ export const hashAndSignBytesWithPrivateKey = (
   return signature;
 };
 
-export const generateSignature = (signMsg, keys: KeyPair):  StdSignature => {
+export const generateSignature = (signMsg, keys: KeyPair): StdSignature => {
   const { private: privKey, public: pubKey } = keys;
   const signedMsgBytes = createSignedMessageBytes(signMsg, privKey);
 
