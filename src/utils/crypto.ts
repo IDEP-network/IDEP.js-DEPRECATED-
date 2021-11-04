@@ -1,13 +1,14 @@
 //import {base64ToBytes, bytesToBase64, toCanonicalJSONBytes} from '@tendermint/belt';
 import {bech32} from 'bech32';
 import {BIP32Interface} from 'bip32';
+import {Cipher, Decipher} from 'crypto';
 import {sha256} from 'js-sha256';
 
 import {KeyPair} from '../types/account';
-import {AesEncryptedPhrase, StdSignature, StdTx, TxSignatureMeta} from '../types/types';
+import {AesEncryptedPhrase, Crypto, KdfParams, StdSignature, StdTx, TxSignatureMeta} from '../types/types';
 import {config} from './config';
-import { Cipher, Decipher } from 'crypto';
 
+const keccak256 = require('keccak256') as typeof import('keccak256');
 const bip32 = require('bip32') as typeof import('bip32');
 const bip39 = require('bip39') as typeof import('bip39');
 const crypto = require('crypto') as typeof import('crypto');
@@ -29,12 +30,34 @@ export const getRandomBytes = (length: number): Promise<Buffer> => {
 
 export const pbkdf2 = (password: string, salt: Buffer): Promise<Buffer> => {
   return new Promise((resolve, reject) => {
-    //   if (password.length % 4)
     const key = Buffer.from(password);
     crypto.pbkdf2(key, salt, 100000, 256 / 8, 'sha512', (err, derivedKey) => {
       if (err) reject(err);
       else resolve(derivedKey);
     });
+  });
+};
+
+export const scrypt = (
+  password: string,
+  salt: Buffer,
+  keylen: number = 32,
+  cost: number = 16384,
+  blocksize: number = 8,
+  parallelization: number = 1
+): Promise<Buffer> => {
+  return new Promise((resolve, reject) => {
+    const key = Buffer.from(password);
+    crypto.scrypt(
+      key,
+      salt,
+      keylen,
+      { N: cost, r: blocksize, p: parallelization },
+      (err, derivedKey) => {
+        if (err) reject(err);
+        else resolve(derivedKey);
+      }
+    );
   });
 };
 
@@ -52,7 +75,17 @@ export const generateMnemonic = async (): Promise<string> => {
   return bip39.entropyToMnemonic(randomBytes.toString('hex'));
 };
 
-export const aesEncrypt = async (
+const getDefaultKdfParams = (): KdfParams => {
+  const kdfParams: KdfParams = {
+    keylen: 32,
+    N: 16384,
+    r: 8,
+    p: 1,
+  };
+  return kdfParams;
+};
+
+export const aesEncryptPbkdf2 = async (
   msg: string,
   pwd: string
 ): Promise<AesEncryptedPhrase> => {
@@ -62,28 +95,106 @@ export const aesEncrypt = async (
   // aes-ctr is just ok with12 bytes, but we need to pad at the end to get required 16 bytes
   const iv: Buffer = Buffer.concat([nonce, Buffer.alloc(4, 0)]);
 
-  let cipher: Cipher = crypto.createCipheriv('aes-256-ctr', key, iv);
-  const encrypted: string =
-    cipher.update(msg.toString(), 'utf8', 'hex') + cipher.final('hex');
+  const encrypted: string = aesEncrypt(msg, key, iv);
   const encryptedPhrase: AesEncryptedPhrase = {
-    cipherText: encrypted,
+    ciphertext: encrypted,
     iv: iv.toString('hex'),
     salt: salt.toString('hex'),
   };
   return encryptedPhrase;
 };
 
-export const aesDecrypt = async (
+export const aesEncrypt = (msg: string, key: Buffer, iv: Buffer): string => {
+  let cipher: Cipher = crypto.createCipheriv('aes-256-ctr', key, iv);
+  const encrypted: string =
+    cipher.update(msg.toString(), 'utf8', 'hex') + cipher.final('hex');
+  return encrypted;
+};
+
+export const aesEncryptScrypt = async (
+  msg: string,
+  pwd: string
+): Promise<Crypto> => {
+  const kdfParams: KdfParams = getDefaultKdfParams();
+  const nonce: Buffer = await getRandomBytes(12);
+  const salt: Buffer = await getRandomBytes(16);
+  const key: Buffer = await scrypt(
+    pwd,
+    salt,
+    kdfParams.keylen,
+    kdfParams.N,
+    kdfParams.r,
+    kdfParams.p
+  );
+  kdfParams.salt = salt.toString('hex');
+  // aes-ctr is just ok with12 bytes, but we need to pad at the end to get required 16 bytes
+  const iv: Buffer = Buffer.concat([nonce, Buffer.alloc(4, 0)]);
+
+  const encrypted: string = aesEncrypt(msg, key, iv);
+
+  const mac = keccak256(
+    Buffer.concat([key.slice(16, 32), Buffer.from(encrypted, 'hex')])
+  ).toString('hex');
+  const encryptedPhrase: Crypto = {
+    ciphertext: encrypted,
+    cipherparams: {
+      iv: iv.toString('hex'),
+    },
+    cipher: 'aes-256-ctr',
+    kdf: 'scrypt',
+    kdfparams: kdfParams,
+    mac: mac,
+  };
+  return encryptedPhrase;
+};
+
+export const aesDecryptScrypt = async (
+  msg: Crypto,
+  pwd: string
+): Promise<string> => {
+  const { ciphertext, cipherparams, kdfparams, mac } = msg;
+
+  const key: Buffer = await scrypt(
+    pwd,
+    Buffer.from(kdfparams.salt, 'hex'),
+    kdfparams.keylen,
+    kdfparams.N,
+    kdfparams.r,
+    kdfparams.p
+  );
+  const testMac = keccak256(
+    Buffer.concat([key.slice(16, 32), Buffer.from(ciphertext, 'hex')])
+  ).toString('hex');
+  if (mac !== testMac)
+    throw new Error('Message Authentication Code does not match');
+  let iv: Buffer = Buffer.from(cipherparams.iv, 'hex');
+  let decipher: Decipher = crypto.createDecipheriv('aes-256-ctr', key, iv);
+  const decrypted: string =
+    decipher.update(ciphertext, 'hex', 'utf8') + decipher.final('utf8');
+  return decrypted;
+};
+
+export const aesDecryptPbkdf2 = async (
   msg: AesEncryptedPhrase,
   pwd: string
 ): Promise<string> => {
   const key: Buffer = await pbkdf2(pwd, Buffer.from(msg.salt, 'hex'));
   let iv: Buffer = Buffer.from(msg.iv, 'hex');
-  let decipher: Decipher = crypto.createDecipheriv('aes-256-ctr', key, iv);
-  const decrypted: string =
-    decipher.update(msg.cipherText, 'hex', 'utf8') + decipher.final('utf8');
+  const decrypted: string = aesDecrypt(msg.ciphertext, iv, key);
   return decrypted;
 };
+
+export const aesDecrypt = (
+  ciphertext: string,
+  iv: Buffer,
+  key: Buffer
+): string => {
+  let decipher: Decipher = crypto.createDecipheriv('aes-256-ctr', key, iv);
+  const decrypted: string =
+    decipher.update(ciphertext, 'hex', 'utf8') + decipher.final('utf8');
+  return decrypted;
+};
+
 export const generateMasterKeyFromMnemonic = async (
   mnemonic: string
 ): Promise<BIP32Interface> => {
@@ -120,6 +231,11 @@ export const getAddressFromPublicKey = (
   key: Buffer,
   prefix: string = config.Bech32Prefix
 ): string => {
+  // TO  DO finish changing  tonative crypto
+  //const sha256Hash = crypto.createHash('sha256');
+  //const ripemd = crypto.createHash('ripemd160');
+  //sha256Hash.update(key);
+
   const message = CryptoJS.enc.Hex.parse(key.toString('hex'));
   const hash = CryptoJS.RIPEMD160(CryptoJS.SHA256(message)).toString();
 
