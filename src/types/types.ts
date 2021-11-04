@@ -85,7 +85,37 @@ export interface StdTx extends Tx {
 }
 
 export interface AesEncryptedPhrase {
-  cipherText: string;
+  ciphertext: string;
   iv: string;
   salt: string;
+}
+
+export interface KdfParams {
+  salt?: string;
+  keylen: number;
+  // cost
+  N: number;
+  // blocksize
+  r: number;
+  // parallelization
+  p: number;
+}
+
+export interface CipherParams {
+  iv: string;
+}
+export interface Crypto {
+  ciphertext: string;
+  cipherparams: CipherParams;
+  cipher: string;
+  kdf: string;
+  kdfparams: KdfParams;
+  mac: string;
+}
+
+export interface EncryptedWallet {
+  version: number;
+  id: string;
+  address: string;
+  crypto: Crypto;
 }

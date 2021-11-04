@@ -1,18 +1,19 @@
+import {EncryptedWallet} from './types';
+
 export interface KeyPair {
- private:  Buffer;
- public: Buffer;
+  private: Buffer;
+  public: Buffer;
 }
 
 export interface Wallet {
- keys: KeyPair;
- address: string;
- mnemonic: any;
+  keys: KeyPair;
+  address: string;
+  mnemonic: any;
 }
 
 export interface KeyRing {
- Keys: KeyPair[];
- write(name: string, key: Wallet): void;
- read(name: string): Wallet;
-
- // add things
+  wallets: EncryptedWallet[]; // regular json keystore files
+  write(name: string, value: EncryptedWallet): void;
+  read(name: string): EncryptedWallet;
+  delete(name: string): void;
 }
