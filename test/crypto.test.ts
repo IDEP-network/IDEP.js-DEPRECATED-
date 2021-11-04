@@ -21,9 +21,24 @@ const readyPbkdfHex =
   'a80835778e547212e690b24e88471cc6d58c158eaba7301352ea73669d85a5f7';
 
 const readyEncrypted = {
-  cipherText: 'a7a2ddb3c965274a7772c5b5',
+  ciphertext: 'a7a2ddb3c965274a7772c5b5',
   iv: '9ae2ba46aa3c30afc74efe9900000000',
   salt: 'b0477184762087f04b7e204cc35429f0',
+};
+
+const secondReadyEncrypted = {
+  ciphertext: '25b97f011c87d0697c233f08',
+  cipherparams: { iv: '66e6388b6eb5d39896bd440f00000000' },
+  cipher: 'aes-256-ctr',
+  kdf: 'scrypt',
+  kdfparams: {
+    keylen: 32,
+    N: 16384,
+    r: 8,
+    p: 1,
+    salt: 'd056ce33c3697320abbcc0fed01f64dc',
+  },
+  mac: 'ee122b55ed8b207a7956bcc29e398d148164ee1834727abd9c9b0c88ec0b6909',
 };
 
 describe('Crypto module', () => {
@@ -70,13 +85,25 @@ describe('Crypto module', () => {
   it('Aes  encrypt works', async () => {
     const pwd = 'randompwd';
     const msg = 'test message';
-    const encrypted = await crypto.aesEncrypt(msg, pwd);
-    const decrypted = await crypto.aesDecrypt(encrypted, pwd);
+    const encrypted = await crypto.aesEncryptPbkdf2(msg, pwd);
+    const decrypted = await crypto.aesDecryptPbkdf2(encrypted, pwd);
     expect(decrypted).toEqual('test message');
   });
   it('Decrypt works  too', async () => {
     const pwd = 'randompwd';
-    const decrypted = await crypto.aesDecrypt(readyEncrypted, pwd);
+    const decrypted = await crypto.aesDecryptPbkdf2(readyEncrypted, pwd);
+    expect(decrypted).toEqual('test message');
+  });
+  it('Aes  encrypt works with  scrypt', async () => {
+    const pwd = 'randompwd';
+    const msg = 'test message';
+    const encrypted = await crypto.aesEncryptScrypt(msg, pwd);
+    const decrypted = await crypto.aesDecryptScrypt(encrypted, pwd);
+    expect(decrypted).toEqual('test message');
+  });
+  it('Decrypt works  too with scrypt', async () => {
+    const pwd = 'randompwd';
+    const decrypted = await crypto.aesDecryptScrypt(secondReadyEncrypted, pwd);
     expect(decrypted).toEqual('test message');
   });
 });
