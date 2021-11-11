@@ -5941,6 +5941,11 @@ js-sha256@^0.9.0:
   resolved "https://registry.npmjs.org/js-sha256/-/js-sha256-0.9.0.tgz"
   integrity sha512-sga3MHh9sgQN2+pJ9VYZ+1LPwXOxuBJBA5nrR5/ofPfuiJBE2hnjsaN8se8JznOmGLN2p49Pe5U/ttafcs/apA==
 
+js-sha3@^0.8.0:
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/js-sha3/-/js-sha3-0.8.0.tgz#b9b7a5da73afad7dedd0f8c463954cbde6818840"
+  integrity sha512-gF1cRrHhIzNfToc802P800N8PpXS+evLLXfsVpowqmAFR9uwbi89WvXg2QspOmXL8QL86J4T1EpFu+yUkwJY3Q==
+
 js-string-escape@^1.0.1:
   version "1.0.1"
   resolved "https://registry.npmjs.org/js-string-escape/-/js-string-escape-1.0.1.tgz"
@@ -7312,6 +7317,11 @@ path-type@^4.0.0:
   resolved "https://registry.npmjs.org/path-type/-/path-type-4.0.0.tgz"
   integrity sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==
 
+pbkdf2-hmac@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/pbkdf2-hmac/-/pbkdf2-hmac-1.0.2.tgz#84205d359bc822fdc773722853f5a54fcaa45d5e"
+  integrity sha512-d+hFcOdODW4hAQBwpPhO+eTOYvJ6E/t2URBjERISD1DBxHM0gIcsVCgZg4aFKS3985wxFj92KDAM3kO7ieVNog==
+
 pbkdf2@^3.0.3, pbkdf2@^3.0.9:
   version "3.1.2"
   resolved "https://registry.npmjs.org/pbkdf2/-/pbkdf2-3.1.2.tgz"
@@ -8425,6 +8435,13 @@ schema-utils@^3.0.0:
     "@types/json-schema" "^7.0.8"
     ajv "^6.12.5"
     ajv-keywords "^3.5.2"
+
+scrypt-pbkdf@^1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/scrypt-pbkdf/-/scrypt-pbkdf-1.0.7.tgz#78554b34c0f93a4e162d9a5016d1cef8b08f9e40"
+  integrity sha512-wBto0Pej8Ay735QGqeWTOoymwZHgc1FrYlotOb8YzCWvxxWFMoVGnTOaLtnI07FlK9QdHdzs7J8bATUeAdU8nQ==
+  dependencies:
+    pbkdf2-hmac "^1.0.2"
 
 secp256k1@^4.0.2:
   version "4.0.2"
