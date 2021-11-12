@@ -4,7 +4,6 @@ import {Crypto, KdfParams} from '../../types/types';
 import {getDefaultKdfParams} from '../crypto';
 import {CryptoStrategy} from './crypto_strategy';
 
-const crypto = require('crypto') as typeof import('crypto');
 export class NodeCrypto implements CryptoStrategy {
   private crypto: any;
   constructor(crypto: any) {
@@ -47,6 +46,11 @@ export class NodeCrypto implements CryptoStrategy {
       );
     });
   }
+  getKeccak(key: Buffer, encryptedphrase: string): string {
+    return sha3.keccak_256(
+      Buffer.concat([key.slice(16, 32), Buffer.from(encryptedphrase, 'hex')])
+    );
+  }
   public async encrypt(msg: string, pwd: string): Promise<any> {
     const kdfParams: KdfParams = getDefaultKdfParams();
     const nonce: Buffer = await this.getRandomBytes(12);
@@ -65,9 +69,7 @@ export class NodeCrypto implements CryptoStrategy {
 
     const encrypted: string = this.aesEncrypt(msg, key, iv);
 
-    const mac = sha3.keccak_256(
-      Buffer.concat([key.slice(16, 32), Buffer.from(encrypted, 'hex')])
-    );
+    const mac = this.getKeccak(key, encrypted);
     const encryptedPhrase: Crypto = {
       ciphertext: encrypted,
       cipherparams: {
@@ -97,13 +99,11 @@ export class NodeCrypto implements CryptoStrategy {
       kdfparams.r,
       kdfparams.p
     );
-    const calculateMac = sha3.keccak_256(
-      Buffer.concat([key.slice(16, 32), Buffer.from(ciphertext, 'hex')])
-    );
-    if (mac !== calculateMac)
+    const recalculatedMac = this.getKeccak(key, ciphertext);
+    if (recalculatedMac !== mac)
       throw new Error('Message Authentication Code does not match');
     let iv: Buffer = Buffer.from(cipherparams.iv, 'hex');
-    let decipher = crypto.createDecipheriv('aes-256-ctr', key, iv);
+    let decipher = this.crypto.createDecipheriv('aes-256-ctr', key, iv);
     const decryptedText: string =
       decipher.update(ciphertext, 'hex', 'utf8') + decipher.final('utf8');
     return decryptedText;

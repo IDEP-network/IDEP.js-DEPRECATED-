@@ -1,25 +1,27 @@
 import sha3 from 'js-sha3';
 import * as scryptPbkdf from 'scrypt-pbkdf';
+import * as util from 'util';
 
 import {Crypto, KdfParams} from '../../types/types';
 import {getDefaultKdfParams} from '../crypto';
 import {CryptoStrategy} from './crypto_strategy';
 
-const util = require('util');
-const { subtle, getRandomValues } = require('crypto').webcrypto;
-
 export class WebCrypto implements CryptoStrategy {
   precomputedHexOctets;
+  getRandomValues: <T>(array: T) => T;
+  subtle: SubtleCrypto;
 
-  constructor() {
+  constructor(subtle, getRandomValues) {
     this.precomputedHexOctets = [];
     for (let n = 0; n <= 0xff; ++n) {
+      this.subtle = subtle;
+      this.getRandomValues = getRandomValues;
       const hexOctet = n.toString(16).padStart(2, '0');
       this.precomputedHexOctets.push(hexOctet);
     }
   }
   public async getRandomBytes(length): Promise<Uint8Array> {
-    return getRandomValues(new Uint8Array(length));
+    return this.getRandomValues(new Uint8Array(length));
   }
   public async kdfMethod(
     password: string,
@@ -57,36 +59,26 @@ export class WebCrypto implements CryptoStrategy {
   }
   hexToBuffer(hex: string): ArrayBuffer {
     const hexString = hex.replace(/^0x/, '');
-
-    // ensure even number of characters
     if (hexString.length % 2 != 0) {
-      console.log(
-        'WARNING: expecting an even number of characters in the hexString'
-      );
+      throw new Error('Invalid hex. Length must be a multiple of 2.');
     }
-
-    // check for some non-hex characters
     const nonHexChars = hexString.match(/[G-Zg-z\s]/i);
     if (nonHexChars) {
-      throw new Error('WARNING: found non-hex characters');
+      throw new Error('Invalid hex. Contains invalid characters.');
     }
 
-    // split the string into pairs of octets
-    const pairs = hexString.match(/[\dA-Fa-f]{2}/gi);
-
-    // convert the octets to integers
-    const integers = pairs.map(s => {
+    const octets = hexString.match(/[\dA-Fa-f]{2}/gi);
+    const decimalNumbers = octets.map(s => {
       return parseInt(s, 16);
     });
 
-    const array = new Uint8Array(integers);
-    console.log(array);
+    const array = new Uint8Array(decimalNumbers);
 
     return array.buffer;
   }
-  async importKey(key: ArrayBuffer) {
-    const imported = await subtle.importKey(
-      'raw', //can be "jwk" or "raw"
+  async importKey(key: ArrayBuffer): Promise<globalThis.CryptoKey> {
+    const imported = await this.subtle.importKey(
+      'raw',
       key,
       {
         name: 'AES-CTR',
@@ -97,19 +89,23 @@ export class WebCrypto implements CryptoStrategy {
     return imported;
   }
 
-  getKeccak(key: ArrayBuffer, encryptedphrase) {
-    const cutKey = new Uint8Array(key, 16, 16);
-    let macBuf = new Uint8Array(16 + encryptedphrase.byteLength);
-    macBuf.set(cutKey);
-    macBuf.set(encryptedphrase, 16);
-    const mac = sha3.keccak_256(macBuf);
+  getKeccak(key: ArrayBuffer, encryptedphrase: ArrayBuffer) {
+    const slicedEncKey = new Uint8Array(key, 16, 16);
+    const typedArrayFromPhrase = new Uint8Array(encryptedphrase);
+    const temporaryArrayBuffer = new ArrayBuffer(
+      16 + typedArrayFromPhrase.byteLength
+    );
+    let macBytes = new Uint8Array(temporaryArrayBuffer);
+    macBytes.set(slicedEncKey);
+    macBytes.set(typedArrayFromPhrase, 16);
+    const mac = sha3.keccak_256(macBytes);
     return mac;
   }
 
   public async encrypt(msg: string, pwd: string) {
-    let encoded = this.encodeMessage(msg);
+    const encoded = this.encodeMessage(msg);
     const kdfParams: KdfParams = getDefaultKdfParams();
-    const salt = getRandomValues(new Uint8Array(16));
+    const salt = this.getRandomValues(new Uint8Array(16));
 
     const key: ArrayBuffer = await this.kdfMethod(
       pwd,
@@ -122,10 +118,10 @@ export class WebCrypto implements CryptoStrategy {
     kdfParams.salt = this.bufferToHex(salt.buffer);
     const webCryptoKey = await this.importKey(key);
     // counter will be needed for decryption
-    const nonce = getRandomValues(new Uint8Array(12));
+    const nonce = this.getRandomValues(new Uint8Array(12));
     let iv = new Uint8Array(16);
     iv.set(nonce);
-    const encrypted: Uint8Array = await subtle.encrypt(
+    const encrypted = await this.subtle.encrypt(
       {
         name: 'AES-CTR',
         counter: iv,
@@ -134,7 +130,6 @@ export class WebCrypto implements CryptoStrategy {
       webCryptoKey,
       encoded
     );
-    console.log(encrypted);
     const mac = this.getKeccak(key, encrypted);
     const encryptedPhrase: Crypto = {
       ciphertext: this.bufferToHex(encrypted),
@@ -163,7 +158,7 @@ export class WebCrypto implements CryptoStrategy {
     const webCryptoKey = await this.importKey(key);
     const iv = new Uint8Array(this.hexToBuffer(msg.cipherparams.iv));
     const text = new Uint8Array(this.hexToBuffer(msg.ciphertext));
-    let decrypted = await subtle.decrypt(
+    const decrypted = await this.subtle.decrypt(
       {
         name: 'AES-CTR',
         counter: iv,
@@ -175,9 +170,8 @@ export class WebCrypto implements CryptoStrategy {
     const decoder = new util.TextDecoder();
     const decryptedText = decoder.decode(decrypted);
 
-    const calculateMac = this.getKeccak(key, text.buffer);
-    console.log(calculateMac);
-    if (calculateMac !== msg.mac) {
+    const recalculatedMac = this.getKeccak(key, text);
+    if (recalculatedMac !== msg.mac) {
       throw new Error('Message Authentication Code does not match');
     }
     return decryptedText;

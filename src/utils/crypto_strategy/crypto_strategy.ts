@@ -1,11 +1,5 @@
-/*
-let crypto;
-try {
-  crypto = await import('crypto');
-} catch (err) {
-  console.log('crypto support is disabled!');
-}
-*/
+import {WebCrypto} from './browser_strategy';
+import {NodeCrypto} from './node_strategy';
 
 export interface CryptoStrategy {
   getRandomBytes(length: number): Promise<Buffer | Uint8Array>;
@@ -16,6 +10,21 @@ export interface CryptoStrategy {
   encrypt(message: string, password: string): Promise<any>;
   decrypt(encryptedphrase: any, password: string): Promise<string>;
 }
+
+export const strategyPicker = () => {
+  const isNode =
+    typeof process !== 'undefined' &&
+    process.versions != null &&
+    process.versions.node != null;
+  if (isNode) {
+    const crypto = require('crypto') as typeof import('crypto');
+    return new NodeCrypto(crypto);
+  } else {
+    const crypto = window.crypto.subtle;
+    const getRandomBytes = window.crypto.getRandomValues;
+    return new WebCrypto(crypto, getRandomBytes);
+  }
+};
 
 export class WalletEncrptor {
   strategy: CryptoStrategy;
