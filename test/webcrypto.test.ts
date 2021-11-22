@@ -55,13 +55,17 @@ describe('Crypto module', () => {
     webCrypto = new WebCrypto(subtle, getRandomValues);
     nodeCrypto = new NodeCrypto(crypto);
   });
-  it('test bfr', async () => {
+  it('web buffer to hex fn works', async () => {
     const randomBytes = new Uint8Array(readyRandomBytes);
     const hex = webCrypto.bufferToHex(randomBytes);
     expect(hex).toBe(readyRandomBytesHex);
   });
   it('browser getRandomBytes returns correct number of bytes', async () => {
     const randomBytes = await webCrypto.getRandomBytes(4);
+    expect(randomBytes).toHaveLength(4);
+  });
+  it('node getRandomBytes returns correct number of bytes', async () => {
+    const randomBytes = await nodeCrypto.getRandomBytes(4);
     expect(randomBytes).toHaveLength(4);
   });
   it('webcrypto hex -> bytes and the other way works', () => {
@@ -106,9 +110,14 @@ describe('Crypto module', () => {
     const msg = 'test message';
     const encrypted = await webCrypto.encrypt(msg, pwd);
     const decrypted = await webCrypto.decrypt(encrypted, pwd);
-    const alsoDecrypted = await nodeCrypto.decrypt(encrypted, pwd);
     expect(decrypted).toEqual('test message');
-    expect(alsoDecrypted).toEqual('test message');
+  });
+  it('Node aes encryption works', async () => {
+    const pwd = 'randompwd';
+    const msg = 'test message';
+    const encrypted = await nodeCrypto.encrypt(msg, pwd);
+    const decrypted = await nodeCrypto.decrypt(encrypted, pwd);
+    expect(decrypted).toEqual('test message');
   });
   it('Encrypt with  browser decrypt with  node', async () => {
     const pwd = 'randompwd';
