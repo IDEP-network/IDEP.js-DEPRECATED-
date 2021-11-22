@@ -3,20 +3,19 @@ import * as scryptPbkdf from 'scrypt-pbkdf';
 import * as util from 'util';
 
 import {Crypto, KdfParams} from '../../types/types';
-import {getDefaultKdfParams} from '../crypto';
-import {CryptoStrategy} from './crypto_strategy';
+import {CryptoStrategy, getDefaultKdfParams} from './crypto_strategy';
 
 export class WebCrypto implements CryptoStrategy {
-  precomputedHexOctets;
+  precomputedHexOctets: string[];
   getRandomValues: <T>(array: T) => T;
   subtle: SubtleCrypto;
 
-  constructor(subtle, getRandomValues) {
+  constructor(subtle: SubtleCrypto, getRandomValues) {
     this.precomputedHexOctets = [];
+    this.subtle = subtle;
+    this.getRandomValues = getRandomValues;
     for (let n = 0; n <= 0xff; ++n) {
-      this.subtle = subtle;
-      this.getRandomValues = getRandomValues;
-      const hexOctet = n.toString(16).padStart(2, '0');
+      const hexOctet: string = n.toString(16).padStart(2, '0');
       this.precomputedHexOctets.push(hexOctet);
     }
   }

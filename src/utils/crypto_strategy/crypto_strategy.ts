@@ -1,3 +1,4 @@
+import {KdfParams} from '../../types/types';
 import {WebCrypto} from './browser_strategy';
 import {NodeCrypto} from './node_strategy';
 
@@ -45,3 +46,13 @@ export class WalletEncrptor {
     return decrypt;
   }
 }
+
+export const getDefaultKdfParams = (): KdfParams => {
+  const kdfParams: KdfParams = {
+    keylen: 32,
+    N: 16384,
+    r: 8,
+    p: 1,
+  };
+  return kdfParams;
+};

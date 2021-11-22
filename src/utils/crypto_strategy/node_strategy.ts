@@ -1,8 +1,7 @@
 import sha3 from 'js-sha3';
 
 import {Crypto, KdfParams} from '../../types/types';
-import {getDefaultKdfParams} from '../crypto';
-import {CryptoStrategy} from './crypto_strategy';
+import {CryptoStrategy, getDefaultKdfParams} from './crypto_strategy';
 
 export class NodeCrypto implements CryptoStrategy {
   private crypto: any;
@@ -25,13 +24,6 @@ export class NodeCrypto implements CryptoStrategy {
     blocksize: number = 8,
     parallelization: number = 1
   ): Promise<Buffer> {
-    /*
-	DEF VALUES; TO BE CHANGED
-	keylen: number = 32,
-	cost: number = 16384,
-	blocksize: number = 8,
-	parallelization: number = 1
-	*/
     return new Promise((resolve, reject) => {
       const passwordBuffer = Buffer.from(password);
       this.crypto.scrypt(
