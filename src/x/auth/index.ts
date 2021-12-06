@@ -1,10 +1,10 @@
-import {Client} from '../../client';
+import {ClientInterfce} from '../../client';
 import {queryAccountRequest, queryParamsRequest} from '../../types/auth';
 
 export class Auth {
-  client: Client;
+  client: ClientInterfce;
 
-  constructor(client: Client) {
+  constructor(client: ClientInterfce) {
     this.client = client;
   }
 
