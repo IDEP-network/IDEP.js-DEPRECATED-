@@ -2,7 +2,7 @@ import Axios, {AxiosInstance} from 'axios';
 
 export type APIParams = Record<string, string | number | null | undefined>;
 
-export class RestClient {
+export class HttpClient {
   axios: AxiosInstance;
   constructor(baseURL: string = '') {
     this.axios = Axios.create({
@@ -19,4 +19,7 @@ export class RestClient {
     return this.axios.get(endpoint).then(d => d.data);
   }
 
+  public async post<T>(data: any): Promise<T> {
+    return this.axios.post('/', data).then(d => d.data);
+  }
 }
