@@ -1,16 +1,16 @@
-import {Client} from '../../client';
+import {ClientInterfce} from '../../client';
 import {
- queryCollectionRequest,
- queryDenomRequest,
- queryMultipleDenomsRequest,
- queryNFTRequest,
- queryOwnerRequest,
- querySupplyRequest
-} from '../../types/ion.uptake';
+  queryCollectionRequest,
+  queryDenomRequest,
+  queryMultipleDenomsRequest,
+  queryNFTRequest,
+  queryOwnerRequest,
+  querySupplyRequest
+} from '../../types/nft';
 
 export class Nft {
-  client: Client;
-  constructor(client: Client) {
+  client: ClientInterfce;
+  constructor(client: ClientInterfce) {
     this.client = client;
   }
 

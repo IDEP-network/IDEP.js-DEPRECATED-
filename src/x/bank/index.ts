@@ -1,9 +1,9 @@
-import {Client} from '../../client';
+import {ClientInterfce} from '../../client';
 import {queryAllBalancesRequest, queryBalanceRequest, queryParamsRequest, querySupplyOfRequest} from '../../types/bank';
 
 export class Bank {
-  client: Client;
-  constructor(client: Client) {
+  client: ClientInterfce;
+  constructor(client: ClientInterfce) {
     this.client = client;
   }
   async checkBalance(address: string, denom: string) {
