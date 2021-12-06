@@ -1,42 +1,46 @@
-import {Coin} from '../../types/types';
+import {Client} from '../../client';
+import {queryAllBalancesRequest, queryBalanceRequest, queryParamsRequest, querySupplyOfRequest} from '../../types/bank';
 
-type Client = any; // TO DO
 export class Bank {
   client: Client;
   constructor(client: Client) {
     this.client = client;
   }
   async checkBalance(address: string, denom: string) {
-    const result: Balance = await this.client.queryClient.requestData(
-      'cosmos/bank/v1beta1/balances/',
-      `${address}/${denom}`
+    const [query, protoResponse] = queryBalanceRequest(address, denom);
+    const balance = await this.client.rpc.abciQuery(
+      '/cosmos.bank.v1beta1.Query/Balance', // remove emagic strings
+      query,
+      protoResponse
     );
-    return result;
+    return balance;
   }
   async checkALlBalances(address: string) {
-    const result: AllBalances = await this.client.queryClient.requestData(
-      'cosmos/bank/v1beta1/balances/',
-      address
+    const [query, protoResponse] = queryAllBalancesRequest(address);
+    const balances = await this.client.rpc.abciQuery(
+      '/cosmos.bank.v1beta1.Query/AllBalances', // remove emagic strings
+      query,
+      protoResponse
     );
-    return result;
+    return balances;
   }
   async checkSupply(denom: string = 'idep') {
-    const result: Supply = await this.client.queryClient.requestData(
-      'cosmos/bank/v1beta1/supply',
-      denom
+    const [query, protoResponse] = querySupplyOfRequest(denom);
+    const denomSupply = await this.client.rpc.abciQuery(
+      '/cosmos.bank.v1beta1.Query/SupplyOf', // remove emagic strings
+      query,
+      protoResponse
     );
-    return result;
+    return denomSupply;
+  }
+
+  async checkParams() {
+    const [query, protoResponse] = queryParamsRequest();
+    const params = await this.client.rpc.abciQuery(
+      '/cosmos.bank.v1beta1.Query/Params', // remove emagic strings
+      query,
+      protoResponse
+    );
+    return params;
   }
 }
-
-type Supply = {
-  supply: Coin;
-};
-
-type Balance = {
-  balance: Coin;
-};
-
-type AllBalances = {
-  balances: Coin[];
-};
