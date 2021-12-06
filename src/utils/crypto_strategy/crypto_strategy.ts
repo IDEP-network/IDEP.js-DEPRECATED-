@@ -12,7 +12,7 @@ export interface CryptoStrategy {
   decrypt(encryptedphrase: any, password: string): Promise<string>;
 }
 
-export const strategyPicker = () => {
+const strategyPicker = () => {
   const isNode =
     typeof process !== 'undefined' &&
     process.versions != null &&
@@ -26,6 +26,8 @@ export const strategyPicker = () => {
     return new WebCrypto(crypto, getRandomBytes);
   }
 };
+
+export const encryptionTool = strategyPicker();
 
 export class WalletEncrptor {
   strategy: CryptoStrategy;
