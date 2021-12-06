@@ -1,53 +1,84 @@
-export class Auth {
-  client: any;
-  defaultFee: any;
+import {Client} from '../../client';
+import {queryAccountRequest, queryParamsRequest} from '../../types/auth';
 
-  constructor(client: any) {
+export class Auth {
+  client: Client;
+
+  constructor(client: Client) {
     this.client = client;
-    this.defaultFee = { ...this.client.configuration.fee };
+  }
+
+  async baseTx(address: string, definedParams: any) {
+    const accountInfo: AccountInfo = await this.checkAccountInfo(address);
+    const baseTx = {
+      memo: definedParams.memo || 'Standard memo',
+      chain_id: definedParams.chainId || 'Test-Denali', // magic string
+      account_number: accountInfo.accountNumber,
+      sequence: accountInfo.sequence,
+    };
+    return baseTx;
   }
   async checkAccountInfo(address: string): Promise<AccountInfo> {
-    const result: AccountInfo = await this.client.queryClient.requestData(
-      'cosmos/auth/v1beta1/accounts/',
-      address
+    const [
+      query,
+      protoResponse,
+      protoBaseAccount,
+      protoPubKey,
+    ] = queryAccountRequest(address);
+    const params = await this.client.rpc.abciQuery(
+      '/cosmos.auth.v1beta1.Query/Account', // remove emagic strings
+      query,
+      protoResponse
     );
-    return result;
+    if (params.account && params.account.value) {
+      let result = protoBaseAccount
+        .deserializeBinary(params.account.value)
+        .toObject();
+      if (result.pubKey && result.pubKey.value) {
+        result = {
+          ...result,
+          pubKey: protoPubKey.deserializeBinary(result.pubKey.value).toObject()
+            .key,
+        };
+      }
+      return result;
+    } else {
+      throw new Error('Sometghin wrong');
+    }
   }
   async checkAuthParams(): Promise<AuthParams> {
-    const result: AuthParams = await this.client.queryClient.requestData(
-      'cosmos/auth/v1beta1/params'
+    const [query, protoResponse] = queryParamsRequest();
+    const params = await this.client.rpc.abciQuery(
+      '/cosmos.auth.v1beta1.Query/Params', // remove emagic strings
+      query,
+      protoResponse
     );
-    return result;
+    return params;
   }
 
   async loadAccountData(walletData): Promise<AccountInfo> {
-    const { public_key, account_number } = walletData;
-    const accountInfo: AccountInfo = await this.checkAccountInfo(
-      account_number
-    );
-    if (!accountInfo.account.pub_key) {
-      accountInfo.account.pub_key = public_key;
+    const { public_key, address } = walletData;
+    const accountInfo: AccountInfo = await this.checkAccountInfo(address);
+    if (!accountInfo.pubKey) {
+      accountInfo.pubKey = public_key;
     }
     return accountInfo;
   }
 }
 
 type AccountInfo = {
-  account: {
-    '@type': string;
-    address: string;
-    pub_key: string | null;
-    account_number: string;
-    sequence: string;
-  };
+  address: string;
+  pubKey?: string | undefined;
+  accountNumber: number;
+  sequence: number;
 };
 
 type AuthParams = {
   params: {
-    max_memo_characters: string;
-    tx_sig_limit: string;
-    tx_size_cost_per_byte: string;
-    sig_verify_cost_ed25519: string;
-    sig_verify_cost_secp256k1: string;
+    maxMemoCharacters: number;
+    txSigLimit: number;
+    txSizeCostPerByte: number;
+    sigVerifyCostEd25519: number;
+    sigVerifyCostSecp256k1: number;
   };
 };
