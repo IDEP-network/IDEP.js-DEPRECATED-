@@ -1,14 +1,25 @@
+import {bufferToBytes} from '@tendermint/belt';
 import {bech32} from 'bech32';
 import {BIP32Interface} from 'bip32';
+import {publicKeyCreate as secp256k1PublicKeyCreate} from 'secp256k1';
 
 import {config} from './config';
+import {ripemd160, sha256} from './hashing';
 
 const bip32 = require('bip32') as typeof import('bip32');
 const bip39 = require('bip39') as typeof import('bip39');
 const crypto = require('crypto') as typeof import('crypto');
-const CryptoJS = require('crypto-js') as typeof import('crypto-js');
-const secp256k1 = require('secp256k1') as typeof import('secp256k1');
+//const CryptoJS = require('crypto-js') as typeof import('crypto-js');
 
+const isNode =
+  typeof process !== 'undefined' &&
+  process.versions != null &&
+  process.versions.node != null;
+if (isNode) {
+  var Buffer = require('buffer').Buffer;
+} else {
+  var Buffer = require('buffer/').Buffer;
+}
 export const getRandomBytes = (length: number): Promise<Buffer> => {
   return new Promise((resolve, reject) => {
     crypto.randomBytes(length, (err, bytes) => {
@@ -26,14 +37,6 @@ export const pbkdf2 = (password: string, salt: Buffer): Promise<Buffer> => {
       else resolve(derivedKey);
     });
   });
-};
-
-export const encodeIntoBech32Format = (
-  hashedAddress: Buffer,
-  prefix: string = config.Bech32Prefix
-): string => {
-  const words = bech32.toWords(hashedAddress);
-  return bech32.encode(prefix, words);
 };
 
 export const verifyAddress = (
@@ -83,39 +86,47 @@ export const generatePrivateKeyFromMnemonic = async (
 ): Promise<Buffer> => {
   const masterKey = await generateMasterKeyFromMnemonic(mnemonic);
 
-  const child: BIP32Interface = masterKey.derivePath(hdPath); // not sure about this line yet
+  const child: BIP32Interface = masterKey.derivePath(hdPath);
   return child.privateKey;
 };
 
-export const derivePublicKeyFromPrivateKey = (
-  privateKey: Buffer | string
-): Buffer => {
-  if (typeof privateKey === 'string') {
-    privateKey = Buffer.from(privateKey);
-  }
-  const publicKey: Uint8Array = secp256k1.publicKeyCreate(privateKey, true);
+export const derivePublicKeyFromPrivateKey = (privateKey: Buffer): Buffer => {
+  const privateKeyBytes = bufferToBytes(privateKey);
+  const publicKey = secp256k1PublicKeyCreate(privateKeyBytes, true);
 
   return Buffer.from(publicKey);
 };
-
-export const getAddressFromPublicKey = (
-  key: Buffer,
+export const encodeIntoBech32Format = (
+  hashedAddress: Buffer,
   prefix: string = config.Bech32Prefix
 ): string => {
-  // TO  DO finish changing  tonative crypto
-  //const sha256Hash = crypto.createHash('sha256');
-  //const ripemd = crypto.createHash('ripemd160');
-  //sha256Hash.update(key);
-
-  const message = CryptoJS.enc.Hex.parse(key.toString('hex'));
-  const hash = CryptoJS.RIPEMD160(CryptoJS.SHA256(message)).toString();
-
-  return encodeIntoBech32Format(Buffer.from(hash, 'hex'), prefix);
+  const words = bech32.toWords(hashedAddress);
+  return bech32.encode(prefix, words);
 };
 
-export const getAddressFromPrivateKey = (
+export const getAddressFromPublicKeyOld = async (
   key: Buffer,
   prefix: string = config.Bech32Prefix
-): string => {
+): Promise<string> => {
+  //const message =CryptoJS.enc.Hex.parse(key.toString('hex'));
+  const hash = await ripemd160(await sha256(key)); //CryptoJS.RIPEMD160(CryptoJS.SHA256(message)).toString();
+
+  return encodeIntoBech32Format(hash, prefix);
+};
+
+export const getAddressFromPublicKey = async (
+  key: Buffer,
+  prefix: string = config.Bech32Prefix
+): Promise<string> => {
+  const message = await sha256(key);
+  const hash = await ripemd160(message);
+  const words = bech32.toWords(hash);
+  return bech32.encode(prefix, words);
+};
+
+export const getAddressFromPrivateKey = async (
+  key: Buffer,
+  prefix: string = config.Bech32Prefix
+): Promise<string> => {
   return getAddressFromPublicKey(derivePublicKeyFromPrivateKey(key), prefix);
 };

@@ -1,3 +1,5 @@
+import {HexEncoded} from '../x/types/aliases';
+
 export interface JsonRpcResponse {
   id: string | number;
   jsonrpc: string;
@@ -58,9 +60,21 @@ export interface Message {
 }
 
 export interface TxSignatureMeta {
-  accountNumber: string;
-  chainId: string;
+  account_number: string;
+  chain_id: string;
   sequence: string;
+}
+
+export interface BaseTx {
+  from: string;
+  account_number: string;
+  memo?: string;
+  chain_id: string;
+  sequence: string;
+  gas: string;
+  gas_adjustment: string;
+  fees: Coin;
+  simulate: boolean;
 }
 
 export interface StdMessageSignature extends TxSignatureMeta {
@@ -71,7 +85,7 @@ export interface StdMessageSignature extends TxSignatureMeta {
 
 export interface StdSignature {
   signature: any;
-  publicKey: any;
+  pub_key: any;
 }
 
 export interface Tx {
@@ -104,18 +118,26 @@ export interface KdfParams {
 export interface CipherParams {
   iv: string;
 }
-export interface Crypto {
-  ciphertext: string;
+export interface EncryptedPrivateKey {
+  ciphertext: HexEncoded;
   cipherparams: CipherParams;
   cipher: string;
   kdf: string;
   kdfparams: KdfParams;
-  mac: string;
+  mac: HexEncoded;
 }
 
 export interface EncryptedWallet {
   version: number;
   id: string;
+  pub_key: string;
   address: string;
   crypto: Crypto;
+}
+
+export interface TxMeta {
+  memo: string;
+  chainId: string;
+  accountNumber: string;
+  sequence: string;
 }
