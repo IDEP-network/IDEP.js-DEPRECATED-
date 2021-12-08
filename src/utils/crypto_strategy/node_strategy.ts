@@ -1,6 +1,8 @@
+import cryptoAsync from '@ronomon/crypto-async';
 import sha3 from 'js-sha3';
 
-import {Crypto, KdfParams} from '../../types/types';
+import {EncryptedPrivateKey, KdfParams} from '../../types/types';
+import {HexEncoded} from '../../x/types/aliases';
 import {CryptoStrategy, getDefaultKdfParams} from './crypto_strategy';
 
 export class NodeCrypto implements CryptoStrategy {
@@ -43,7 +45,7 @@ export class NodeCrypto implements CryptoStrategy {
       Buffer.concat([key.slice(16, 32), Buffer.from(encryptedphrase, 'hex')])
     );
   }
-  public async encrypt(msg: string, pwd: string): Promise<any> {
+  public async encrypt(msg: string, pwd: string): Promise<EncryptedPrivateKey> {
     const kdfParams: KdfParams = getDefaultKdfParams();
     const nonce: Buffer = await this.getRandomBytes(12);
     const salt: Buffer = await this.getRandomBytes(16);
@@ -59,10 +61,10 @@ export class NodeCrypto implements CryptoStrategy {
     // aes-ctr is just ok with12 bytes, but we need to pad at the end to get required 16 bytes
     const iv: Buffer = Buffer.concat([nonce, Buffer.alloc(4, 0)]);
 
-    const encrypted: string = this.aesEncrypt(msg, key, iv);
+    const encrypted: HexEncoded = this.aesEncrypt(msg, key, iv);
 
     const mac = this.getKeccak(key, encrypted);
-    const encryptedPhrase: Crypto = {
+    const encryptedPhrase: EncryptedPrivateKey = {
       ciphertext: encrypted,
       cipherparams: {
         iv: iv.toString('hex'),
@@ -74,13 +76,13 @@ export class NodeCrypto implements CryptoStrategy {
     };
     return encryptedPhrase;
   }
-  aesEncrypt(msg: string, key: Buffer, iv: Buffer): string {
+  aesEncrypt(msg: string, key: Buffer, iv: Buffer): HexEncoded {
     let cipher = this.crypto.createCipheriv('aes-256-ctr', key, iv);
     const encrypted: string =
       cipher.update(msg.toString(), 'utf8', 'hex') + cipher.final('hex');
     return encrypted;
   }
-  public async decrypt(msg: Crypto, pwd: string): Promise<string> {
+  public async decrypt(msg: EncryptedPrivateKey, pwd: string): Promise<string> {
     const { ciphertext, cipherparams, kdfparams, mac } = msg;
 
     const key: Buffer = await this.kdfMethod(

@@ -2,7 +2,8 @@ import sha3 from 'js-sha3';
 import * as scryptPbkdf from 'scrypt-pbkdf';
 import * as util from 'util';
 
-import {Crypto, KdfParams} from '../../types/types';
+import {EncryptedPrivateKey, KdfParams} from '../../types/types';
+import {HexEncoded} from '../../x/types/aliases';
 import {CryptoStrategy, getDefaultKdfParams} from './crypto_strategy';
 
 export class WebCrypto implements CryptoStrategy {
@@ -48,7 +49,7 @@ export class WebCrypto implements CryptoStrategy {
     let enc = new util.TextEncoder();
     return enc.encode(msg);
   }
-  bufferToHex(arrayBuffer: ArrayBuffer): string {
+  bufferToHex(arrayBuffer: ArrayBuffer): HexEncoded {
     const buff = new Uint8Array(arrayBuffer);
     const hexOctets = [];
     for (let i = 0; i < buff.length; ++i)
@@ -56,7 +57,7 @@ export class WebCrypto implements CryptoStrategy {
 
     return hexOctets.join('');
   }
-  hexToBuffer(hex: string): ArrayBuffer {
+  hexToBuffer(hex: HexEncoded): ArrayBuffer {
     const hexString = hex.replace(/^0x/, '');
     if (hexString.length % 2 != 0) {
       throw new Error('Invalid hex. Length must be a multiple of 2.');
@@ -74,6 +75,10 @@ export class WebCrypto implements CryptoStrategy {
     const array = new Uint8Array(decimalNumbers);
 
     return array.buffer;
+  }
+  async sha256(thing: any) {
+    const hashBuffer = await this.subtle.digest('SHA-256', thing);
+    return this.bufferToHex(hashBuffer);
   }
   async importKey(key: ArrayBuffer): Promise<globalThis.CryptoKey> {
     const imported = await this.subtle.importKey(
@@ -101,7 +106,7 @@ export class WebCrypto implements CryptoStrategy {
     return mac;
   }
 
-  public async encrypt(msg: string, pwd: string) {
+  public async encrypt(msg: string, pwd: string): Promise<EncryptedPrivateKey> {
     const encoded = this.encodeMessage(msg);
     const kdfParams: KdfParams = getDefaultKdfParams();
     const salt = this.getRandomValues(new Uint8Array(16));
@@ -130,7 +135,7 @@ export class WebCrypto implements CryptoStrategy {
       encoded
     );
     const mac = this.getKeccak(key, encrypted);
-    const encryptedPhrase: Crypto = {
+    const encryptedPhrase: EncryptedPrivateKey = {
       ciphertext: this.bufferToHex(encrypted),
       cipherparams: {
         iv: this.bufferToHex(iv.buffer),
@@ -142,7 +147,7 @@ export class WebCrypto implements CryptoStrategy {
     };
     return encryptedPhrase;
   }
-  public async decrypt(msg: Crypto, pwd: string): Promise<string> {
+  public async decrypt(msg: EncryptedPrivateKey, pwd: string): Promise<string> {
     const kdfParams: KdfParams = getDefaultKdfParams();
     const salt = new Uint8Array(this.hexToBuffer(msg.kdfparams.salt));
     const key: ArrayBuffer = await this.kdfMethod(

@@ -12,7 +12,7 @@ export interface CryptoStrategy {
   decrypt(encryptedphrase: any, password: string): Promise<string>;
 }
 
-const strategyPicker = () => {
+const encryptionToolFactory = () => {
   const isNode =
     typeof process !== 'undefined' &&
     process.versions != null &&
@@ -27,7 +27,7 @@ const strategyPicker = () => {
   }
 };
 
-export const encryptionTool = strategyPicker();
+export const EncryptionTool = encryptionToolFactory();
 
 export class WalletEncrptor {
   strategy: CryptoStrategy;
