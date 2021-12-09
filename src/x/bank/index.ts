@@ -22,7 +22,7 @@ export class Bank {
   constructor(client: ClientInterfce) {
     this.client = client;
   }
-  async msgSendTx(
+  async msgSend(
     transfer: SendTransfer,
     baseTx: {
       from: Bech32Address;
@@ -42,7 +42,7 @@ export class Bank {
     return this.client.tx.buildSignSend(msgs, baseTx);
   }
 
-  async msgMultiSendTx(
+  async msgMultiSend(
     inputs: InputOrOutput[],
     outputs: InputOrOutput[],
     baseTx: {
