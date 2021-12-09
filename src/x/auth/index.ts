@@ -8,15 +8,13 @@ export class Auth {
     this.client = client;
   }
 
-  async baseTx(address: string, definedParams: any) {
+  async baseTx(address: string, definedParams?: any): Promise<any> {
     const accountInfo: AccountInfo = await this.checkAccountInfo(address);
-    const baseTx = {
-      memo: definedParams.memo || 'Standard memo',
-      chain_id: definedParams.chainId || 'Test-Denali', // magic string
-      account_number: accountInfo.accountNumber,
+    const txMeta = {
+      accountNumber: accountInfo.accountNumber,
       sequence: accountInfo.sequence,
     };
-    return baseTx;
+    return txMeta;
   }
   async checkAccountInfo(address: string): Promise<AccountInfo> {
     const [
