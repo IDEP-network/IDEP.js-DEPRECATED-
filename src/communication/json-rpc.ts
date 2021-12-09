@@ -30,7 +30,6 @@ export class JsonRpc {
         response: { value },
       },
     } = response;
-    console.log(value);
     const decoded = protoResponse
       ? protoResponse.deserializeBinary(value).toObject()
       : JSON.parse(Buffer.from(value, 'base64').toString());
