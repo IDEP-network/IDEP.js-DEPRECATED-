@@ -1,2 +1,15 @@
 /node_modules/
 .vscode
+*.proto
+.sidenotes/radek/5d96d81e-eba5-47c8-abc7-caf8512c5ca0.md
+.sidenotes/radek/613bbdf3-5215-41f1-a6fd-396f1afc6264.md
+.sidenotes/radek/645042cc-aa69-41f2-9699-9ab947ecad07.md
+.sidenotes/radek/8ecf5b84-98fb-40f1-9c9e-9604ac34e187.md
+.sidenotes/radek/b4d82e89-1e82-42fa-aaa8-762458c9c3bf.md
+.sidenotes/radek/c9f5df07-1670-4f3b-b1af-2a57037414d3.md
+.sidenotes/radek/f5daa0b4-8e88-46c9-bc9d-6a250d1aaf20.md
+docs/strategy.md
+.jshintrc
+.protolint.yaml
+scripts/protocgen.sh
+proto/buf.yaml
