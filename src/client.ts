@@ -1,14 +1,17 @@
 import {JsonRpc} from './communication/json-rpc';
 import {HttpClient} from './communication/querying/HttpClient';
+import SignTxTool from './utils/signing';
 import {Auth} from './x/auth';
 import {Bank} from './x/bank';
 import {Nft} from './x/nft';
+import {Tx} from './x/tx';
 
 class Client {
   rpc: JsonRpc;
   private _auth?: Auth;
   private _bank?: Bank;
   private _nft?: Nft;
+  private _tx?: Tx;
   constructor(rpcClient: JsonRpc, wallet: any = false) {
     if (!wallet) {
       //gen neew wallet
@@ -28,6 +31,10 @@ class Client {
   get nft(): Nft {
     if (!this._nft) this._nft = new Nft(this);
     return this._nft;
+  }
+  get tx(): Tx {
+    if (!this._tx) this._tx = new Tx(this, SignTxTool);
+    return this._tx;
   }
 }
 
