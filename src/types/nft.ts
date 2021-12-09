@@ -166,14 +166,14 @@ export class MsgBurnNFT {
   }
 }
 
-interface MsgIssueDenomValue {
+export interface MsgIssueDenomValue {
   id: string;
   name: string;
   schema: string;
   sender: string;
 }
 
-interface NFTParams {
+export interface NFTParams {
   id: string;
   name: string;
   denomId: string;
@@ -183,26 +183,27 @@ interface NFTParams {
   recipient: string;
 }
 
-interface MsgEditNFTValue
+export interface MsgEditNFTValue
   extends Omit<NFTParams, 'recipient' | 'name' | 'uri' | 'data'> {
   name?: string;
   uri?: string;
   data?: string;
 }
 
-interface NFTDefaultBlankFieldValues {
+export interface NFTDefaultBlankFieldValues {
   name: string;
   uri: string;
   data: string;
 }
 
-interface TransferNftValue extends Omit<NFTParams, 'name' | 'uri' | 'data'> {
+export interface TransferNftValue
+  extends Omit<NFTParams, 'name' | 'uri' | 'data'> {
   name?: string;
   uri?: string;
   data?: string;
 }
 
-interface MsgBurnNFTValue {
+export interface MsgBurnNFTValue {
   id: string;
   denomId: string;
   sender: string;
