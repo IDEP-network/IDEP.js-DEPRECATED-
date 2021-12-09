@@ -2,6 +2,7 @@ import {sha256} from 'js-sha256';
 
 import {StdSignature} from '../types/types';
 import {StdSignMsg} from '../x/tx';
+import {HexEncoded} from '../x/types/aliases';
 
 const secp256k1 = require('secp256k1') as typeof import('secp256k1');
 
@@ -98,3 +99,30 @@ export class SigningTool {
     return true;
   };
 }
+
+const hexToBuffer = (hex: HexEncoded): ArrayBuffer => {
+  const hexString = hex.replace(/^0x/, '');
+  if (hexString.length % 2 != 0) {
+    throw new Error('Invalid hex. Length must be a multiple of 2.');
+  }
+  const nonHexChars = hexString.match(/[G-Zg-z\s]/i);
+  if (nonHexChars) {
+    throw new Error('Invalid hex. Contains invalid characters.');
+  }
+
+  const octets = hexString.match(/[\dA-Fa-f]{2}/gi);
+  const decimalNumbers = octets.map(s => {
+    return parseInt(s, 16);
+  });
+
+  const array = new Uint8Array(decimalNumbers);
+
+  return array.buffer;
+};
+
+const signingToolFactory = () => {
+  const tool = new SigningTool(hexToBuffer);
+  return tool;
+};
+
+export default signingToolFactory();
