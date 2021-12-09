@@ -1,5 +1,5 @@
-import * as accountUtils from '../src/utils/account';
 
+import * as crypto from '../src/utils/account';
 const readyMnemo =
   'cost unfold manage group pen cradle agree library rose lizard proof supply canvas assault orchard patch zebra absurd useful upset south glide miracle ostrich';
 
@@ -13,41 +13,43 @@ const readyPublicKey = Buffer.from([
   167, 36, 218, 57, 126, 157, 196, 55, 67, 78, 105, 13, 142, 89, 36, 110,
 ]);
 
-const readyAddress = 'idep19hv30 xxwzk3q04h9jh4ct7z09tutuhst5jewev';
-
+const readyAddress = 'idep19hv30xxwzk3q04h9jh4ct7z09tutuhst5jewev';
 describe('Crypto module', () => {
   it('getRandomBytes returns correct number of bytes', async () => {
-    const randomBytes = await accountUtils.getRandomBytes(4);
+    const randomBytes = await crypto.getRandomBytes(4);
     expect(randomBytes).toHaveLength(4);
   });
   it('encoding into bech32 format works', () => {
-    const accEncoded = accountUtils.encodeIntoBech32Format(
+      Buffer.from('foobar', 'utf8'),
+      'foo'
+    );
+    const accEncoded = crypto.encodeIntoBech32Format(
       Buffer.from('foobar', 'utf8'),
       'foo'
     );
     expect(accEncoded).toEqual('foo1vehk7cnpwgry9h96');
   });
   it('Generates random mnemonic', async () => {
-    const mnemonic = await accountUtils.generateMnemonic();
+    const mnemonic = await crypto.generateMnemonic();
     expect(mnemonic.split(' ').length).toEqual(24);
   });
   it('Generates private key', async () => {
-    const privateKey = await accountUtils.generatePrivateKeyFromMnemonic(
+    const privateKey = await crypto.generatePrivateKeyFromMnemonic(readyMnemo);
       readyMnemo
     );
     expect(privateKey.toString('hex')).toBe(readyPrivateKey.toString('hex'));
   });
   it('Generates public key as well', async () => {
-    const publicKey =
-      accountUtils.derivePublicKeyFromPrivateKey(readyPrivateKey);
+    const publicKey = crypto.derivePublicKeyFromPrivateKey(readyPrivateKey);
     expect(publicKey.toString('hex')).toBe(readyPublicKey.toString('hex'));
   });
   it('Gets an address', async () => {
-    const address = accountUtils.getAddressFromPublicKey(readyPublicKey);
+    const address = await crypto.getAddressFromPublicKey(readyPublicKey);
     expect(address).toBe(readyAddress);
 
-    const addressFromPrivate =
-      accountUtils.getAddressFromPrivateKey(readyPrivateKey);
+    const addressFromPrivate = await crypto.getAddressFromPrivateKey(
+      readyPrivateKey
+    );
     expect(addressFromPrivate).toBe(readyAddress);
   });
 });
