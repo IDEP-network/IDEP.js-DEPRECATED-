@@ -37,6 +37,7 @@ export class WalletUtilities {
 }
 
 export class Wallet {
+  // TODO add getters for wallet's data to check for cases when it isn't available
   publicKey: HexEncoded;
   address: string;
   privateKey: EncryptedPrivateKey;
@@ -47,12 +48,12 @@ export class Wallet {
     this.encryptionTool = encryptionTool;
     this.store = store;
   }
-  async loadFromStore() {
+  async listSavedWallets() {
     const storedWallets = await this.store.getSavedWallets();
     this.storedWalletsNames = storedWallets;
     return storedWallets;
   }
-  async retrieveWalletFromStore(name: string): Promise<WalletJson> {
+  async retrieveSavedWallet(name: string): Promise<WalletJson> {
     const wallet = await this.store.pickWallet(name);
     const { pub_key, address, crypto } = wallet;
     this.publicKey = pub_key;
@@ -80,27 +81,27 @@ export class Wallet {
     };
     await this.store.saveWallet(name, encryptedWallet);
   }
-  async getNewWallet(password: string) {
+  async createNew(password: string) {
     const wallet = await WalletUtilities.generateWallet();
     const { privateKey, publicKey, address } = wallet;
     await this.storeWalletInMemory(password, privateKey, publicKey, address);
   }
-  async walletFromSeed(password: string, mnemonic: string) {
+  async restoreFromSeed(password: string, mnemonic: string) {
     const wallet = await WalletUtilities.recoverFromMnemonics(mnemonic);
     const { privateKey, publicKey, address } = wallet;
     await this.storeWalletInMemory(password, privateKey, publicKey, address);
   }
-  async walletFromPrivateKey(privKey: HexEncoded, password: string) {
+  async restoreFromPrivateKey(privKey: HexEncoded, password: string) {
     const wallet = await WalletUtilities.recoverFromPrivateKey(privKey);
     const { privateKey, publicKey, address } = wallet;
     await this.storeWalletInMemory(password, privateKey, publicKey, address);
   }
-  async retrieveKeys(password: string) {
+  async getPrivateKey(password: string) {
     const privateKey = await this.encryptionTool.decrypt(
       this.privateKey,
       password
     );
-    return { privateKey, publicKey: this.publicKey, address: this.address };
+    return privateKey;
   }
   retrievepubKeyAndAddress() {
     return { publicKey: this.publicKey, address: this.address };
