@@ -6,7 +6,10 @@ describe('Examples and tests of wallet usage', () => {
     client = Client;
   });
   it('Create and persist new wallet', async () => {
-    await client.wallet.createNew('encryptionPassword');
+    const mnemo = await client.wallet.createNew('encryptionPassword');
+    console.log(
+      `This is wallet's mnemonic phrase ${mnemo}. Make sure to let the  usere know it has to be seeecurely stored  and that theree is  no way to show it second time`
+    );
     console.log(client.wallet);
     await client.wallet.persistWallet('walletName');
   });

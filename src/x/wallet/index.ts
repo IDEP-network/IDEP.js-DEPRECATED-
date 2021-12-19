@@ -83,8 +83,9 @@ export class Wallet {
   }
   async createNew(password: string) {
     const wallet = await WalletUtilities.generateWallet();
-    const { privateKey, publicKey, address } = wallet;
+    const { privateKey, publicKey, address, mnemonic } = wallet;
     await this.storeWalletInMemory(password, privateKey, publicKey, address);
+    return mnemonic;
   }
   async restoreFromSeed(password: string, mnemonic: string) {
     const wallet = await WalletUtilities.recoverFromMnemonics(mnemonic);
