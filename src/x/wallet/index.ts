@@ -1,11 +1,10 @@
-// wallet as an interface for tx generation and signing, with actual wallets provided by the keys class.  keys  class di gets  only keyring interface, no client. wallet has to get a  wallet passed through constructor and then  it can be  interface to create txs.
-import {EncryptedPrivateKey} from '../../types/types';
+import {EncryptedPrivateKey, EncryptedWallet} from '../../types/types';
 import * as walletCreationTool from '../../utils/account';
 import {CryptoStrategy, EncryptionTool} from '../../utils/crypto_strategy/crypto_strategy';
 import {HexEncoded} from '../types/aliases';
+import {PersistentStorage, Store, WalletJson} from './store';
 
 export class WalletUtilities {
-  //  TO DO STORE DATA ENCRYPTED, PERSISTENT STORAGE
   static async generateWallet() {
     const mnemonic = await walletCreationTool.generateMnemonic();
     const {
@@ -39,12 +38,29 @@ export class WalletUtilities {
 
 export class Wallet {
   publicKey: HexEncoded;
+  address: string;
   privateKey: EncryptedPrivateKey;
   encryptionTool: CryptoStrategy;
-  address: string;
-  constructor(encryptionTool: CryptoStrategy) {
+  storedWalletsNames: string[];
+  store: PersistentStorage;
+  constructor(encryptionTool: CryptoStrategy, store: PersistentStorage) {
     this.encryptionTool = encryptionTool;
+    this.store = store;
   }
+  async loadFromStore() {
+    const storedWallets = await this.store.getSavedWallets();
+    this.storedWalletsNames = storedWallets;
+    return storedWallets;
+  }
+  async retrieveWalletFromStore(name: string): Promise<WalletJson> {
+    const wallet = await this.store.pickWallet(name);
+    const { pub_key, address, crypto } = wallet;
+    this.publicKey = pub_key;
+    this.address = address;
+    this.privateKey = crypto;
+    return wallet;
+  }
+
   async storeWalletInMemory(password, privateKey, publicKey, address) {
     this.privateKey = await this.encryptionTool.encrypt(
       privateKey.toString('hex'),
@@ -53,20 +69,33 @@ export class Wallet {
     this.publicKey = publicKey.toString('hex');
     this.address = address;
   }
+  async persistWallet(name: string) {
+    const ramdomBytes = await this.encryptionTool.getRandomBytes(12);
+    const encryptedWallet: EncryptedWallet = {
+      name,
+      id: Buffer.from(ramdomBytes).toString('hex'),
+      pub_key: this.publicKey,
+      address: this.address,
+      crypto: this.privateKey,
+    };
+    await this.store.saveWallet(name, encryptedWallet);
+  }
   async getNewWallet(password: string) {
     const wallet = await WalletUtilities.generateWallet();
     const { privateKey, publicKey, address } = wallet;
-    this.storeWalletInMemory(password, privateKey, publicKey, address);
+    await this.storeWalletInMemory(password, privateKey, publicKey, address);
   }
   async walletFromSeed(password: string, mnemonic: string) {
     const wallet = await WalletUtilities.recoverFromMnemonics(mnemonic);
     const { privateKey, publicKey, address } = wallet;
-    this.storeWalletInMemory(password, privateKey, publicKey, address);
+    await this.storeWalletInMemory(password, privateKey, publicKey, address);
   }
-  async walleetFromPrivateKey(password: string, mnemonic?: string | undefined) {
     const wallet = await WalletUtilities.generateWallet();
+  async walletFromPrivateKey(privKey: HexEncoded, password: string) {
+    const wallet = await WalletUtilities.recoverFromPrivateKey(privKey);
     const { privateKey, publicKey, address } = wallet;
-    this.storeWalletInMemory(password, privateKey, publicKey, address);
+    console.log('2 ', privateKey);
+    await this.storeWalletInMemory(password, privateKey, publicKey, address);
   }
   async retrieveKeys(password: string) {
     const privateKey = await this.encryptionTool.decrypt(
@@ -81,7 +110,7 @@ export class Wallet {
 }
 
 const walletFactory = () => {
-  const wallet = new Wallet(EncryptionTool);
+  const wallet = new Wallet(EncryptionTool, Store);
   return wallet;
 };
 

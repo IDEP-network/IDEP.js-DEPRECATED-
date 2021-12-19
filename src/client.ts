@@ -1,10 +1,10 @@
 import {JsonRpc} from './communication/json-rpc';
 import {HttpClient} from './communication/querying/HttpClient';
-import SignTxTool from './utils/signing';
 import {Auth} from './x/auth';
 import {Bank} from './x/bank';
 import {Nft} from './x/nft';
 import {Tx} from './x/tx';
+import {wallet} from './x/wallet';
 
 class Client {
   rpc: JsonRpc;
@@ -12,11 +12,10 @@ class Client {
   private _bank?: Bank;
   private _nft?: Nft;
   private _tx?: Tx;
-  constructor(rpcClient: JsonRpc, wallet: any = false) {
-    if (!wallet) {
-      //gen neew wallet
-    }
+  wallet: any;
+  constructor(rpcClient: JsonRpc, wallet) {
     this.rpc = rpcClient;
+    this.wallet = wallet;
   }
   get auth(): Auth {
     if (!this._auth) this._auth = new Auth(this);
@@ -33,17 +32,17 @@ class Client {
     return this._nft;
   }
   get tx(): Tx {
-    if (!this._tx) this._tx = new Tx(this, SignTxTool);
+    if (!this._tx) this._tx = new Tx(this);
     return this._tx;
   }
 }
 
 const clientFactory = (): Client => {
-  const rpcClient = new JsonRpc(HttpClient, 'http://142.93.65.220:26657');
-  const client: Client = new Client(rpcClient);
+  const rpcClient = new JsonRpc(HttpClient, 'http://159.89.84.111:26657');
+  const client: Client = new Client(rpcClient, wallet);
   return client;
 };
 
 export default clientFactory();
 
-export interface ClientInterfce extends Client {}
+export interface ClientInterface extends Client {}
