@@ -90,11 +90,9 @@ export class Wallet {
     const { privateKey, publicKey, address } = wallet;
     await this.storeWalletInMemory(password, privateKey, publicKey, address);
   }
-    const wallet = await WalletUtilities.generateWallet();
   async walletFromPrivateKey(privKey: HexEncoded, password: string) {
     const wallet = await WalletUtilities.recoverFromPrivateKey(privKey);
     const { privateKey, publicKey, address } = wallet;
-    console.log('2 ', privateKey);
     await this.storeWalletInMemory(password, privateKey, publicKey, address);
   }
   async retrieveKeys(password: string) {
