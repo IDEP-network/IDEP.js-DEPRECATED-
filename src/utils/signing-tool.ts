@@ -1,8 +1,7 @@
-import {sha256} from 'js-sha256';
-
 import {StdSignature} from '../types/types';
 import {StdSignMsg} from '../x/tx';
 import {HexEncoded} from '../x/types/aliases';
+import {sha256} from './hashing';
 
 const secp256k1 = require('secp256k1') as typeof import('secp256k1');
 
@@ -18,6 +17,7 @@ export class SigningTool {
   constructor(hexToBytes) {
     this.hexToBytes = hexToBytes;
   }
+
   signTx = (tx: StdSignMsg, keys: KeyPair): StdSignMsg => {
     const signMsg = this.createSignMsg(tx);
     const signature = this.generateSignature(signMsg, keys);
@@ -34,17 +34,24 @@ export class SigningTool {
 
   createSignMsg = (tx: StdSignMsg) => {
     return {
-      account_number: tx.account_number,
-      chain_id: tx.chain_id,
+      msgs: tx.msgs,
+      pub_key: tx.pub_key,
       fee: tx.fee,
       memo: tx.memo,
-      msg: tx.msg,
+      chainId: tx.chainId,
+      accountNumber: tx.accountNumber,
       sequence: tx.sequence,
     };
   };
-  generateSignature = (signMsg, keys: KeyPair): StdSignature => {
+  static signatureForSignDoc = async (signDoc, { priv_key }) => {
+    const msgHashed = await sha256(signDoc);
+    const msgHasheedUintArr = new Uint8Array(msgHashed);
+    const { signature } = secp256k1.ecdsaSign(msgHasheedUintArr, priv_key);
+    return Buffer.from(signature).toString('base64');
+  };
+  generateSignature = async (signMsg, keys: KeyPair): Promise<StdSignature> => {
     const { priv_key, pub_key } = keys;
-    const signedMsgBytes = this.createSignedMessageBytes(
+    const signedMsgBytes = await this.createSignedMessageBytes(
       signMsg,
       this.hexToBytes(priv_key)
     );
@@ -57,33 +64,39 @@ export class SigningTool {
       },
     };
   };
-  createSignedMessageBytes = (signMsg, privateKey: Uint8Array): Uint8Array => {
+  createSignedMessageBytes = async (
+    signMsg,
+    privateKey: Uint8Array
+  ): Promise<Uint8Array> => {
     const msgInBytesFormat = tendermintBelt.toCanonicalJSONBytes(signMsg);
-    return this.hashAndSignBytesWithPrivateKey(msgInBytesFormat, privateKey);
+    return await this.hashAndSignBytesWithPrivateKey(
+      msgInBytesFormat,
+      privateKey
+    );
   };
-  hashAndSignBytesWithPrivateKey = (
+  hashAndSignBytesWithPrivateKey = async (
     bytes: Uint8Array,
     key: Uint8Array
-  ): Uint8Array => {
-    const hash = sha256.array(bytes);
+  ): Promise<Uint8Array> => {
+    const hash = await sha256(bytes);
     const uintArr = new Uint8Array(hash);
     const { signature } = secp256k1.ecdsaSign(uintArr, key);
     return signature;
   };
-  verifySignedBytes = (signMsg, signature, pubKey): boolean => {
+  verifySignedBytes = async (signMsg, signature, pub_key): Promise<boolean> => {
     const bytes = tendermintBelt.toCanonicalJSONBytes(signMsg);
-    const hash = sha256.array(bytes);
+    const hash = await sha256(bytes);
     const uintArr = new Uint8Array(hash);
 
-    return secp256k1.ecdsaVerify(signature, uintArr, pubKey);
+    return secp256k1.ecdsaVerify(signature, uintArr, pub_key);
   };
-  verifySingleSignature = (signMsg, signature): boolean => {
+  verifySingleSignature = async (signMsg, signature): Promise<boolean> => {
     const signedBytes = tendermintBelt.base64ToBytes(signature.signature);
-    const pubKey = tendermintBelt.base64ToBytes(
+    const pub_key = tendermintBelt.base64ToBytes(
       signature.pub_key?.value || signature.pub_key
     );
 
-    return this.verifySignedBytes(signMsg, signedBytes, pubKey);
+    return await this.verifySignedBytes(signMsg, signedBytes, pub_key);
   };
 
   verifyTxSignatures = (signMsg, signatures): boolean => {

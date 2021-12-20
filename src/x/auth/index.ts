@@ -1,22 +1,37 @@
-import {ClientInterfce} from '../../client';
+import {ClientInterface} from '../../client';
+import {restClient} from '../../communication/querying/BaseQuery';
 import {queryAccountRequest, queryParamsRequest} from '../../types/auth';
 
 export class Auth {
-  client: ClientInterfce;
+  client: ClientInterface;
 
-  constructor(client: ClientInterfce) {
+  constructor(client: ClientInterface) {
     this.client = client;
   }
 
-  async baseTx(address: string, definedParams?: any): Promise<any> {
-    const accountInfo: AccountInfo = await this.checkAccountInfo(address);
+  async baseTx(address: string): Promise<any> {
+    const accountInfo = await this.checkAccountInfo(address);
     const txMeta = {
       accountNumber: accountInfo.accountNumber,
       sequence: accountInfo.sequence,
     };
     return txMeta;
   }
-  async checkAccountInfo(address: string): Promise<AccountInfo> {
+  async restRequest(address: string): Promise<any> {
+    try {
+      const response = await restClient.requestData('auth/accounts', address);
+      console.log(response);
+      const accountNumber = response.result.value.account_number;
+      const newAccountInfo = {
+        accountNumber,
+        sequence: 0,
+      };
+      return newAccountInfo;
+    } catch (err) {
+      throw new Error(err.message);
+    }
+  }
+  async checkAccountInfo(address: string): Promise<AccountInfo | any> {
     const [
       query,
       protoResponse,
@@ -41,7 +56,7 @@ export class Auth {
       }
       return result;
     } else {
-      throw new Error('Sometghin wrong');
+      return this.restRequest(address);
     }
   }
   async checkAuthParams(): Promise<AuthParams> {
