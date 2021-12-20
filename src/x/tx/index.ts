@@ -1,42 +1,63 @@
-import {ClientInterfce} from '../../client';
-import {MsgSend, TxType} from '../../types/Msgs';
-import {Coin} from '../../types/types';
-import {SigningTool} from '../../utils/signing';
+import {ClientInterface} from '../../client';
+import {StdFee} from '../../types/types';
+import {SigningTool} from '../../utils/signing-tool';
 import {HexEncoded} from '../types/aliases';
-import {TxRaw} from '../types/TxRaw';
+import {TxFactory} from '../types/TxRaw';
 
 export class Tx {
-  private client: ClientInterfce;
-  private signingTool: SigningTool;
-  constructor(client: ClientInterfce, signingTool: SigningTool) {
+  private client: ClientInterface;
+  constructor(client: ClientInterface) {
     this.client = client;
-    this.signingTool = signingTool;
   }
 
-  async wrapTxInMetaData(msgs: any[], baseTx: any) {
-    const accountInfo = await this.client.auth.baseTx(baseTx.from, baseTx);
-    const txRaw: TxRaw = new TxRaw(
-      msgs,
-      baseTx.pub_key,
-      baseTx.memo,
-      baseTx.chainId,
-      accountInfo.accountNumber,
-      accountInfo.sequence
+  async createTxRaw(msgs: any[], baseTx: any) {
+    const accountInfo = await this.client.auth.baseTx(baseTx.from);
+    const txFactory = new TxFactory();
+    txFactory.addBody(msgs, baseTx.memo);
+    const publicKey = baseTx.pub_key || this.client.wallet.publicKey;
+    txFactory.addAuthInfo(publicKey, accountInfo.sequence, baseTx.fee);
+    const txRaw = txFactory.buildTx(accountInfo.accountNumber);
+    return txRaw;
+  }
+
+  buildSignSend = async (msgs: any[], baseTx: any) => {
+    const unsignedTxRaw = await this.createTxRaw(msgs, baseTx);
+    const privateKey = await this.client.wallet.getPrivateKey(baseTx.password);
+    console.log(privateKey);
+    const signature = await this.sign(
+      unsignedTxRaw.getSignDoc(),
+      new Uint8Array(Buffer.from(privateKey, 'hex'))
     );
-  }
+    unsignedTxRaw.sign(signature);
+    const tt = unsignedTxRaw.getData();
+    console.log(tt);
+    const readyForSending = unsignedTxRaw.getRaw();
+    console.log('readyForSending ', readyForSending);
+    return this.client.rpc.send(readyForSending.serializeBinary());
+  };
 
-  buildSignSend(msgs: any[], baseTx: any) {
-    const unsignedTx = this.wrapTxInMetaData(msgs, baseTx);
-  }
-
-  async sign(txRaw: TxRaw) {
+  async sign(signDoc, priv_key) {
     // add checks and throws
-    const {
-      privateKey: priv_key,
-      publicKey: pub_key,
-    } = this.client.wallet.retrieveKeys('asd');
-    const signDoc = txRaw.getSignDocForSigning();
+    // const privateKey = await this.client.wallet.getPrivateKey(
+    // this.client.configuration.accountWallet,
+    // this.client.configuration.password
+    //);
 
-    return this.signingTool.signTx(signDoc, { priv_key, pub_key });
+    return await SigningTool.signatureForSignDoc(signDoc.serializeBinary(), {
+      priv_key,
+    });
+  }
+}
+export interface StdSignMsg {
+  accountNumber: string;
+  sequence?: string;
+  chainId?: string;
+  fee?: StdFee;
+  memo?: string;
+  signatures?: any[];
+  msgs?: any[];
+  pub_key: HexEncoded;
+}
+
   }
 }
