@@ -86,18 +86,18 @@ export class MsgMultiSend {
   }
 }
 
-interface InputOrOutput {
+export interface InputOrOutput {
   address: Bech32Address;
   coins: Coin[];
 }
 
-interface MsgSendValue {
+export interface MsgSendValue {
   fromAddress: Bech32Address;
   toAddress: Bech32Address;
   amount: Coin[];
 }
 
-interface MsgMultiSendValue {
+export interface MsgMultiSendValue {
   inputs: InputOrOutput[];
   outputs: InputOrOutput[];
 }
