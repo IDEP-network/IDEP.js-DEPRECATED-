@@ -14,7 +14,7 @@ var global = Function('return this')();
 
 var gogoproto_gogo_pb = require('../../gogoproto/gogo_pb.js');
 goog.object.extend(proto, gogoproto_gogo_pb);
-var idep_nft_nft_pb = require('../../idep/nft/nft_pb.js');
+var idep_nft_nft_pb = require('./nft_pb.js');
 goog.object.extend(proto, idep_nft_nft_pb);
 goog.exportSymbol('proto.idep.nft.GenesisState', null, global);
 /**
