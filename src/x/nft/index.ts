@@ -1,4 +1,4 @@
-import {ClientInterfce} from '../../client';
+import {ClientInterface} from '../../client';
 import {
   MsgBurnNFT,
   MsgBurnNFTValue,
@@ -17,12 +17,12 @@ import {
   querySupplyRequest,
   TransferNftValue
 } from '../../types/nft';
-import {StdFee} from '../tx';
+import {StdFee} from '../../types/types';
 import {Bech32Address, HexEncoded} from '../types/aliases';
 
 export class Nft {
-  client: ClientInterfce;
-  constructor(client: ClientInterfce) {
+  client: ClientInterface;
+  constructor(client: ClientInterface) {
     this.client = client;
   }
   async msgIssueDenom(
