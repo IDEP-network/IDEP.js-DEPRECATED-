@@ -30,10 +30,14 @@ export class GeneralTxTools {
   static createFee(amounts: Coin[], gas: string): ProtoBuffObject {
     let fee = new pbs.tx_tx_pb.Fee();
     fee.setGasLimit(gas);
+    const coins = amounts.map(GeneralTxTools.createCoin);
+    /*
     amounts.forEach(el => {
       const coin = GeneralTxTools.createCoin(el);
       fee.addAmount(coin);
     });
+    */
+    fee.setAmountList(coins);
     return fee;
   }
   static populateSignerInfo(sequence: number, pubKey: string): ProtoBuffObject {
@@ -52,12 +56,12 @@ export class GeneralTxTools {
   static populatePubKey(pubKey: HexEncoded): ProtoBuffObject {
     // TODO support other types of keys
     const pbech = GeneralTxTools.getHexPubkey(pubKey);
-    const pubKeyProto: ProtoBuffObject = pbs.crypto_secp256k1_keys_pb.PubKey();
-    pubKeyProto.setPubKey(Buffer.from(pbech, 'hex'));
+    const pubKeyProto: ProtoBuffObject = new pbs.crypto_secp256k1_keys_pb.PubKey();
+    pubKeyProto.setKey(Buffer.from(pbech, 'hex'));
     // check key type
     return GeneralTxTools.createAny(
       'cosmos.crypto.secp256k1.PubKey',
-      pubKeyProto.serializeBinary()
+      pubKeyProto
     );
   }
   static getHexPubkey(pubkey: HexEncoded): HexEncoded {
@@ -86,9 +90,7 @@ export class GeneralTxTools {
   static populateTxBody(msgs, memo, timeoutHeight?: number): ProtoBuffObject {
     let body = new pbs.tx_tx_pb.TxBody();
     msgs.forEach(msg => {
-      body.addMessages(
-        GeneralTxTools.createAny(msg.type, msg.serializeBinary())
-      );
+      body.addMessages(GeneralTxTools.createAny(msg.type, msg));
     });
     body.setMemo(memo);
     body.setTimeoutHeight(timeoutHeight);
