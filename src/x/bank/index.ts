@@ -1,4 +1,4 @@
-import {ClientInterfce} from '../../client';
+import {ClientInterface} from '../../client';
 import {
   InputOrOutput,
   MsgMultiSend,
@@ -18,15 +18,16 @@ interface SendTransfer {
 }
 
 export class Bank {
-  client: ClientInterfce;
-  constructor(client: ClientInterfce) {
+  client: ClientInterface;
+  constructor(client: ClientInterface) {
     this.client = client;
   }
   async msgSend(
     transfer: SendTransfer,
     baseTx: {
       from: Bech32Address;
-      pub_key: HexEncoded;
+      password: string;
+      pub_key?: HexEncoded;
       gas?: string | undefined;
       fee?: StdFee | undefined;
       memo?: string | 'No memes for you';
@@ -34,10 +35,10 @@ export class Bank {
   ) {
     // TODO validate addrresses
     const value = ({
-      ...transfer,
+      amount: transfer.amount,
+      toAddress: transfer.recipient,
       fromAddress: baseTx.from,
     } as unknown) as MsgSendValue;
-
     const msgs: any[] = [new MsgSend(value)];
     return this.client.tx.buildSignSend(msgs, baseTx);
   }
