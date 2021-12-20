@@ -3,7 +3,7 @@ import {HttpClient} from './HttpClient';
 export class BaseQuery {
   httpUrl: string;
   q: HttpClient;
-  constructor(restCli, httpUrl: string = 'http://142.93.65.220:1317/') {
+  constructor(restCli, httpUrl: string = 'http://159.89.84.111:1317/') {
     this.httpUrl = httpUrl;
     this.q = new restCli(this.httpUrl);
   }
@@ -11,3 +11,9 @@ export class BaseQuery {
     return this.q.get(`${endpoint}/${pathParams}`);
   }
 }
+
+const querierFactory = () => {
+  return new BaseQuery(HttpClient);
+};
+
+export const restClient = querierFactory();

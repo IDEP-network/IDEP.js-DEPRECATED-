@@ -128,11 +128,12 @@ export interface EncryptedPrivateKey {
 }
 
 export interface EncryptedWallet {
-  version: number;
+  version?: number;
+  name: string;
   id: string;
   pub_key: string;
   address: string;
-  crypto: Crypto;
+  crypto: EncryptedPrivateKey;
 }
 
 export interface TxMeta {
