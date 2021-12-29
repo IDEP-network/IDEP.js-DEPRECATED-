@@ -1,4 +1,3 @@
-import cryptoAsync from '@ronomon/crypto-async';
 import sha3 from 'js-sha3';
 
 import {EncryptedPrivateKey, KdfParams} from '../../types/types';
