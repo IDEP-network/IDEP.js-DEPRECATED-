@@ -9,3 +9,5 @@ export type Base64Encoded = string;
 export type Base58Encoded = string;
 
 export type Bech32Address = string;
+
+export type ProtoBuffBytes = any;
