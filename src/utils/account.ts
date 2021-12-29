@@ -10,7 +10,6 @@ import isNode from './is_node';
 const bip32 = require('bip32') as typeof import('bip32');
 const bip39 = require('bip39') as typeof import('bip39');
 const crypto = require('crypto') as typeof import('crypto');
-//const CryptoJS = require('crypto-js') as typeof import('crypto-js');
 
 if (isNode) {
   var Buffer = require('buffer').Buffer;
@@ -22,16 +21,6 @@ export const getRandomBytes = (length: number): Promise<Buffer> => {
     crypto.randomBytes(length, (err, bytes) => {
       if (err) reject(err);
       else resolve(bytes);
-    });
-  });
-};
-
-export const pbkdf2 = (password: string, salt: Buffer): Promise<Buffer> => {
-  return new Promise((resolve, reject) => {
-    const key = Buffer.from(password);
-    crypto.pbkdf2(key, salt, 100000, 256 / 8, 'sha512', (err, derivedKey) => {
-      if (err) reject(err);
-      else resolve(derivedKey);
     });
   });
 };
@@ -61,7 +50,7 @@ export const verifyAddress = (
 };
 
 export const generateMnemonic = async (): Promise<string> => {
-  const randomBytes = await getRandomBytes(32);
+  const randomBytes = await getRandomBytes(24);
 
   return bip39.entropyToMnemonic(randomBytes.toString('hex'));
 };
@@ -70,9 +59,9 @@ export const generateMasterKeyFromMnemonic = async (
   mnemonic: string
 ): Promise<BIP32Interface> => {
   // throws if mnemonic is invalid
-  if (!bip39.validateMnemonic(mnemonic)) {
-    throw new Error('Invalid mnemonic format'); // TO-DO custom error type
-  }
+  // if (!bip39.validateMnemonic(mnemonic)) {
+  //   throw new Error('Invalid mnemonic format'); // TO-DO custom error //type
+  // }
   const seed: Buffer = await bip39.mnemonicToSeed(mnemonic);
   return bip32.fromSeed(seed);
 };
@@ -87,7 +76,7 @@ export const generatePrivateKeyFromMnemonic = async (
   return child.privateKey;
 };
 
-export const derivePublicKeyFromPrivateKey = (privateKey: Buffer): Buffer => {
+export const derivePublicKeyFromPrivateKey = (privateKey: Buffer): any => {
   const privateKeyBytes = bufferToBytes(privateKey);
   const publicKey = secp256k1PublicKeyCreate(privateKeyBytes, true);
 
@@ -99,16 +88,6 @@ export const encodeIntoBech32Format = (
 ): string => {
   const words = bech32.toWords(hashedAddress);
   return bech32.encode(prefix, words);
-};
-
-export const getAddressFromPublicKeyOld = async (
-  key: Buffer,
-  prefix: string = config.Bech32Prefix
-): Promise<string> => {
-  //const message =CryptoJS.enc.Hex.parse(key.toString('hex'));
-  const hash = await ripemd160(await sha256(key)); //CryptoJS.RIPEMD160(CryptoJS.SHA256(message)).toString();
-
-  return encodeIntoBech32Format(hash, prefix);
 };
 
 export const getAddressFromPublicKey = async (
