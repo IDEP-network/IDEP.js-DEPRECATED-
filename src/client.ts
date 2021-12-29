@@ -4,7 +4,7 @@ import {Auth} from './x/auth';
 import {Bank} from './x/bank';
 import {Nft} from './x/nft';
 import {Tx} from './x/tx';
-import {wallet} from './x/wallet';
+import {wallet, WalletInterface} from './x/wallet';
 
 class Client {
   rpc: JsonRpc;
@@ -12,8 +12,8 @@ class Client {
   private _bank?: Bank;
   private _nft?: Nft;
   private _tx?: Tx;
-  wallet: any;
-  constructor(rpcClient: JsonRpc, wallet) {
+  wallet: WalletInterface;
+  constructor(rpcClient: JsonRpc, wallet: WalletInterface) {
     this.rpc = rpcClient;
     this.wallet = wallet;
   }
