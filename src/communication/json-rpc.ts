@@ -8,10 +8,10 @@ export class JsonRpc {
     this.http = new httpClient(this.httpUrl);
   }
   // meethod - enum
-  async request(method: string, params: object = {}) {
+  async request(method: string, params: any) {
     const data = {
       jsonrpc: '2.0',
-      id: 'SanfordNetwork', // i think so?
+      id: 'jsonrpc-client', // i think so?
       method,
       params,
     };
@@ -37,15 +37,30 @@ export class JsonRpc {
   }
   async send(
     txBytes,
-    method: string = 'broadcast_tx_sync',
-    protoResponse?: any
+    protoResponse?: any,
+    method: string = 'broadcast_tx_sync'
   ) {
-    console.log(txBytes);
-    const data = {
-      method,
-      tx: Buffer.from(txBytes).toString('base64'),
+    const params = {
+      tx: Buffer.from(txBytes, 'binary').toString('base64'),
     };
-    const response = await this.request(method, data);
+    const response = await this.request(method, params);
+    console.log(response);
+    const {
+      result: {
+        response: { value },
+      },
+    } = response;
+    const decoded = protoResponse
+      ? protoResponse.deserializeBinary(value).toObject()
+      : JSON.parse(Buffer.from(value, 'base64').toString());
+    return decoded;
+  }
+  async simulate(txBytes, protoResponse?: any, method: string = 'abci_query') {
+    const params = {
+      path: '/app/simulate',
+      data: `${Buffer.from(txBytes, 'binary').toString('hex')}`,
+    };
+    const response = await this.request(method, params);
     console.log(response);
     const {
       result: {
