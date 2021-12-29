@@ -1,6 +1,6 @@
 import Keyv from 'keyv';
 
-import isNode from '../../utils/is_node';
+import isNode from '../../utils/is-node';
 
 export type WalletJson = any;
 export type StorageAdapter = any;

@@ -2,7 +2,7 @@ import {ClientInterface} from '../../client';
 import {SigningTool} from '../../cryptography/signing-tool';
 import {StdFee} from '../../types/types';
 import {HexEncoded, ProtoBuffObject} from '../types/aliases';
-import {TxFactory} from '../types/TxRaw';
+import {TxFactory} from '../types/tx-raw';
 
 export class Tx {
   private client: ClientInterface;

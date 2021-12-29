@@ -1,11 +1,16 @@
 import {bech32} from 'bech32';
 
+import {CryptoStrategy, EncryptionTool} from '../../cryptography/encryption/crypto-strategy';
+import * as walletCreationTool from '../../cryptography/wallet-utils';
 import {EncryptedPrivateKey, EncryptedWallet} from '../../types/types';
-import * as walletCreationTool from '../../utils/account';
-import {CryptoStrategy, EncryptionTool} from '../../utils/crypto_strategy/crypto_strategy';
-import {Bech32Address, HexEncoded} from '../types/aliases';
+import {Bech32Address, Bech32PublicKey, HexEncoded} from '../types/aliases';
 import {PersistentStorage, Store, WalletJson} from './store';
 
+interface WalletDataForUser {
+  address: Bech32Address;
+  publicKey: Bech32PublicKey;
+  mnemonic?: string;
+}
 export class WalletUtilities {
   static async generateWallet() {
     const mnemonic = await walletCreationTool.generateMnemonic();
@@ -51,6 +56,7 @@ export class Wallet {
     this.store = store;
   }
   async listSavedWallets() {
+  async listSavedWallets(): Promise<string[]> {
     const storedWallets = await this.store.getSavedWallets();
     return storedWallets;
   }
@@ -93,7 +99,7 @@ export class Wallet {
     }
     await this.store.saveWallet(encryptedWallet.name, encryptedWallet);
   }
-  async createNew(password: string, name?: string) {
+  async createNew(password: string, name?: string): Promise<WalletDataForUser> {
     const walletPromise = WalletUtilities.generateWallet();
     const ramdomBytesPromise = this.encryptionTool.getRandomBytes(12);
     const promiseResults = await Promise.allSettled([
@@ -130,18 +136,24 @@ export class Wallet {
     const publicKey = this.formatPublicKeyForUserInteraction(publicKeyRaw);
     return { mnemonic, publicKey, address };
   }
-  async restoreFromSeed(password: string, mnemonic: string): Promise<any> {
+  async restoreFromSeed(
+    password: string,
+    mnemonic: string
+  ): Promise<WalletDataForUser> {
     const wallet = await WalletUtilities.recoverFromMnemonics(mnemonic);
     return this.handleRestoredWallet(wallet, password);
   }
   async restoreFromPrivateKey(
     privKey: HexEncoded,
     password: string
-  ): Promise<any> {
+  ): Promise<WalletDataForUser> {
     const wallet = await WalletUtilities.recoverFromPrivateKey(privKey);
     return this.handleRestoredWallet(wallet, password);
   }
-  async handleRestoredWallet(wallet, password) {
+  async handleRestoredWallet(
+    wallet,
+    password: string
+  ): Promise<WalletDataForUser> {
     const { privateKey, publicKey: publicKeyRaw, address } = wallet;
     const encryptedPrivate = await this.encryptionTool.encrypt(
       privateKey.toString('hex'),
@@ -164,7 +176,7 @@ export class Wallet {
     );
     return privateKey;
   }
-  retrievepubKeyAndAddress() {
+  retrievepubKeyAndAddress(): WalletDataForUser {
     return {
       publicKey: this.formatPublicKeyForUserInteraction(),
       address: this.address,
@@ -181,7 +193,7 @@ export class Wallet {
   }
   formatPublicKeyForUserInteraction(
     publicKey: HexEncoded = this.publicKey
-  ): string {
+  ): Bech32PublicKey {
     const aminoPrefixedPubKey: Buffer = this.addAminoPrefixToPubKey(publicKey);
     const words = bech32.toWords(aminoPrefixedPubKey);
     const encodedPublicKey = bech32.encode('ideppub', words, 200);

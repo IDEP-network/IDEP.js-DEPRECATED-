@@ -1,6 +1,6 @@
-import {GeneralTxTools} from '../x/tx/genTx';
+import {GeneralTxTools} from '../x/tx/general-tx-tools';
 import {Bech32Address, ProtoBuffObject, ProtoBuffType} from '../x/types/aliases';
-import {MsgType} from './msg_types';
+import {MsgType} from './msg-types';
 import * as pbs from './proto';
 import {Coin} from './types';
 
