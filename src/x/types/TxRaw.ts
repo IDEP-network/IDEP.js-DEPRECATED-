@@ -146,7 +146,7 @@ export class TxFactory {
     sequence?: number,
     fee: StdFee = {
       gas: '200000',
-      amount: [{ denom: 'unyan', amount: '500' }],
+      amount: [{ denom: 'idep', amount: '500' }],
     }
   ) {
     this.auth_info = new AuthInfo(public_key, sequence, fee);
