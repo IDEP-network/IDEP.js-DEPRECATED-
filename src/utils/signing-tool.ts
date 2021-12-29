@@ -1,6 +1,6 @@
 import {StdSignature} from '../types/types';
 import {StdSignMsg} from '../x/tx';
-import {HexEncoded} from '../x/types/aliases';
+import {Base64Encoded, HexEncoded} from '../x/types/aliases';
 import {sha256} from './hashing';
 
 const secp256k1 = require('secp256k1') as typeof import('secp256k1');
@@ -43,7 +43,11 @@ export class SigningTool {
       sequence: tx.sequence,
     };
   };
-  static signatureForSignDoc = async (signDoc, { priv_key }) => {
+  static signatureForSignDoc = async (
+    signDoc: Buffer,
+    priv_key: Uint8Array
+  ): Promise<Base64Encoded> => {
+    // TODO standardize the params
     const msgHashed = await sha256(signDoc);
     const msgHasheedUintArr = new Uint8Array(msgHashed);
     const { signature } = secp256k1.ecdsaSign(msgHasheedUintArr, priv_key);
