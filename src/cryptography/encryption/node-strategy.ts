@@ -2,7 +2,7 @@ import sha3 from 'js-sha3';
 
 import {EncryptedPrivateKey, KdfParams} from '../../types/types';
 import {HexEncoded} from '../../x/types/aliases';
-import {CryptoStrategy, getDefaultKdfParams} from './crypto_strategy';
+import {CryptoStrategy, getDefaultKdfParams} from './crypto-strategy';
 
 export class NodeCrypto implements CryptoStrategy {
   private crypto: any;

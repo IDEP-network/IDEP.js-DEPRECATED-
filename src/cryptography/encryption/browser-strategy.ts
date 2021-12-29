@@ -4,7 +4,7 @@ import * as util from 'util';
 
 import {EncryptedPrivateKey, KdfParams} from '../../types/types';
 import {HexEncoded} from '../../x/types/aliases';
-import {CryptoStrategy, getDefaultKdfParams} from './crypto_strategy';
+import {CryptoStrategy, getDefaultKdfParams} from './crypto-strategy';
 
 export class WebCrypto implements CryptoStrategy {
   precomputedHexOctets: string[];
