@@ -37,7 +37,7 @@ class Client {
   }
 }
 
-const clientFactory = (nodeUrl: string): Client => {
+const clientFactory = (nodeUrl?: string): Client => {
   const rpcClient = new JsonRpc(HttpClient, nodeUrl);
   const client: Client = new Client(rpcClient, wallet);
   return client;
