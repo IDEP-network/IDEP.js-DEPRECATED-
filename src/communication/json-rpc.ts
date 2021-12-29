@@ -3,7 +3,10 @@ import {HttpClient} from './querying/HttpClient';
 export class JsonRpc {
   httpUrl: string;
   http: HttpClient;
-  constructor(httpClient, httpUrl: string = 'http://159.89.84.111:26657') {
+  constructor(
+    httpClient,
+    httpUrl: string = 'http://159.89.84.111:26657'
+  ) {
     this.httpUrl = httpUrl;
     this.http = new httpClient(this.httpUrl);
   }
@@ -38,7 +41,7 @@ export class JsonRpc {
   async send(
     txBytes,
     protoResponse?: any,
-    method: string = 'broadcast_tx_sync'
+    method: string = 'broadcast_tx_commit'
   ) {
     const params = {
       tx: Buffer.from(txBytes, 'binary').toString('base64'),
