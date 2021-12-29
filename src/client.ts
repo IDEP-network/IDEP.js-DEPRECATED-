@@ -37,12 +37,12 @@ class Client {
   }
 }
 
-const clientFactory = (): Client => {
-  const rpcClient = new JsonRpc(HttpClient, 'http://159.89.84.111:26657');
+const clientFactory = (nodeUrl: string): Client => {
+  const rpcClient = new JsonRpc(HttpClient, nodeUrl);
   const client: Client = new Client(rpcClient, wallet);
   return client;
 };
 
-export default clientFactory();
+export default clientFactory;
 
 export interface ClientInterface extends Client {}
