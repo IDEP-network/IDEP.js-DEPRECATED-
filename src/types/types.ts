@@ -51,7 +51,7 @@ export interface Coin {
 
 export interface StdFee {
   amount: Coin[];
-  gas: string;
+  gas: any;
 }
 
 export interface Message {
@@ -131,7 +131,7 @@ export interface EncryptedWallet {
   version?: number;
   name: string;
   id: string;
-  pub_key: string;
+  publicKey: string;
   address: string;
   crypto: EncryptedPrivateKey;
 }
