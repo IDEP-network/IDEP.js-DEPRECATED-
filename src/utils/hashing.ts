@@ -1,9 +1,7 @@
 import cryptoAsync from '@ronomon/crypto-async';
 
-const isNode =
-  typeof process !== 'undefined' &&
-  process.versions != null &&
-  process.versions.node != null;
+import isNode from './is_node';
+
 if (isNode) {
   var Buffer = require('buffer').Buffer;
 } else {

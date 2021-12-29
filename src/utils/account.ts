@@ -5,16 +5,13 @@ import {publicKeyCreate as secp256k1PublicKeyCreate} from 'secp256k1';
 
 import {config} from './config';
 import {ripemd160, sha256} from './hashing';
+import isNode from './is_node';
 
 const bip32 = require('bip32') as typeof import('bip32');
 const bip39 = require('bip39') as typeof import('bip39');
 const crypto = require('crypto') as typeof import('crypto');
 //const CryptoJS = require('crypto-js') as typeof import('crypto-js');
 
-const isNode =
-  typeof process !== 'undefined' &&
-  process.versions != null &&
-  process.versions.node != null;
 if (isNode) {
   var Buffer = require('buffer').Buffer;
 } else {

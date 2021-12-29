@@ -1,4 +1,5 @@
 import {KdfParams} from '../../types/types';
+import isNode from '../is_node';
 import {WebCrypto} from './browser_strategy';
 import {NodeCrypto} from './node_strategy';
 
@@ -13,10 +14,6 @@ export interface CryptoStrategy {
 }
 
 const encryptionToolFactory = () => {
-  const isNode =
-    typeof process !== 'undefined' &&
-    process.versions != null &&
-    process.versions.node != null;
   if (isNode) {
     const crypto = require('crypto') as typeof import('crypto');
     return new NodeCrypto(crypto);
