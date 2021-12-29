@@ -1,7 +1,7 @@
 import {ClientInterface} from '../../client';
 import {StdFee} from '../../types/types';
 import {SigningTool} from '../../utils/signing-tool';
-import {HexEncoded} from '../types/aliases';
+import {HexEncoded, ProtoBuffObject} from '../types/aliases';
 import {TxFactory} from '../types/TxRaw';
 
 export class Tx {
@@ -23,29 +23,27 @@ export class Tx {
   buildSignSend = async (msgs: any[], baseTx: any) => {
     const unsignedTxRaw = await this.createTxRaw(msgs, baseTx);
     const privateKey = await this.client.wallet.getPrivateKey(baseTx.password);
-    console.log(privateKey);
     const signature = await this.sign(
       unsignedTxRaw.getSignDoc(),
       new Uint8Array(Buffer.from(privateKey, 'hex'))
     );
     unsignedTxRaw.sign(signature);
-    const tt = unsignedTxRaw.getData();
-    console.log(tt);
     const readyForSending = unsignedTxRaw.getRaw();
-    console.log('readyForSending ', readyForSending);
     return this.client.rpc.send(readyForSending.serializeBinary());
   };
 
-  async sign(signDoc, priv_key) {
+  async sign(signDoc: ProtoBuffObject, priv_key: Uint8Array) {
     // add checks and throws
     // const privateKey = await this.client.wallet.getPrivateKey(
     // this.client.configuration.accountWallet,
     // this.client.configuration.password
     //);
 
-    return await SigningTool.signatureForSignDoc(signDoc.serializeBinary(), {
-      priv_key,
-    });
+    return await SigningTool.signatureForSignDoc(
+      Buffer.from(signDoc.serializeBinary(), 'binary'),
+      priv_key
+    );
+  }
   }
 }
 export interface StdSignMsg {
