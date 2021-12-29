@@ -47,10 +47,10 @@ export class Auth {
       let result = protoBaseAccount
         .deserializeBinary(params.account.value)
         .toObject();
-      if (result.pubKey && result.pubKey.value) {
+      if (result.pub_key && result.pub_key.key) {
         result = {
           ...result,
-          pubKey: protoPubKey.deserializeBinary(result.pubKey.value).toObject()
+          pubKey: protoPubKey.deserializeBinary(result.pub_key.value).toObject()
             .key,
         };
       }
