@@ -1,10 +1,10 @@
 import Long from 'long';
 
+import { sha256 } from '../../cryptography/hashing';
 import * as pbs from '../../types/proto';
-import {StdFee} from '../../types/types';
-import {sha256} from '../../utils/hashing';
-import {GeneralTxTools} from '../tx/genTx';
-import {HexEncoded, ProtoBuffBytes} from './aliases';
+import { StdFee } from '../../types/types';
+import { GeneralTxTools } from '../tx/general-tx-tools';
+import { HexEncoded, ProtoBuffBytes } from './aliases';
 
 interface TxBody {
   messages: any[];
@@ -70,7 +70,7 @@ class SignerInfo {
   }
 }
 class AuthInfo {
-  signer_info: SignerInfo; // add multiple SignerInfo
+  signer_info: SignerInfo; // add multiple SignerInfos
   fee: StdFee;
   constructor(public_key: HexEncoded, sequence: number, fee: StdFee) {
     this.signer_info = new SignerInfo(public_key, sequence);

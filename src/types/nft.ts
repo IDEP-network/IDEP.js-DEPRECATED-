@@ -1,5 +1,5 @@
 import {ProtoBuffObject, ProtoBuffType} from '../x/types/aliases';
-import {MsgType} from './msg_types';
+import {MsgType} from './msg-types';
 import * as pbs from './proto';
 
 export const querySupplyRequest = (denomId?: string, owner?: string) => {
