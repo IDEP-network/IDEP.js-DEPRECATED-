@@ -1,6 +1,6 @@
 import {ClientInterface} from '../../client';
+import {SigningTool} from '../../cryptography/signing-tool';
 import {StdFee} from '../../types/types';
-import {SigningTool} from '../../utils/signing-tool';
 import {HexEncoded, ProtoBuffObject} from '../types/aliases';
 import {TxFactory} from '../types/TxRaw';
 

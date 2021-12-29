@@ -1,6 +1,6 @@
 import cryptoAsync from '@ronomon/crypto-async';
 
-import isNode from './is_node';
+import isNode from '../utils/is-node';
 
 if (isNode) {
   var Buffer = require('buffer').Buffer;
