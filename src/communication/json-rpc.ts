@@ -1,14 +1,18 @@
+import {HexEncoded} from '../x/types/aliases';
 import {HttpClient} from './querying/HttpClient';
 
+const sleep = (milliseconds = 500) =>
+  new Promise(resolve => setTimeout(resolve, milliseconds));
+
 export class JsonRpc {
-  httpUrl: string;
+  url: string;
   http: HttpClient;
   constructor(
     httpClient,
     httpUrl: string = 'http://159.89.84.111:26657'
   ) {
-    this.httpUrl = httpUrl;
-    this.http = new httpClient(this.httpUrl);
+    this.url = httpUrl;
+    this.http = new httpClient(this.url);
   }
   // meethod - enum
   async request(method: string, params: any) {
@@ -40,23 +44,33 @@ export class JsonRpc {
   }
   async send(
     txBytes,
-    protoResponse?: any,
     method: string = 'broadcast_tx_commit'
   ) {
+    // TODO normalize return type
     const params = {
       tx: Buffer.from(txBytes, 'binary').toString('base64'),
     };
     const response = await this.request(method, params);
-    console.log(response);
+    if(method !== 'broadcast_tx_commit') {
+      const {
+        result: { hash },
+      } = response;
+      return `Tx hash ${hash}`;
+    }
     const {
       result: {
-        response: { value },
-      },
+        deliver_tx: {
+          log
+        }
+      }
     } = response;
-    const decoded = protoResponse
-      ? protoResponse.deserializeBinary(value).toObject()
-      : JSON.parse(Buffer.from(value, 'base64').toString());
-    return decoded;
+    return log;
+  }
+  async checkTx(txHash: HexEncoded){
+    // TODO improve
+    const fetchedTx = await this.http.get(`/tx?hash=0x${txHash.toUpperCase()}`);
+    const {result} = fetchedTx;
+    return result;
   }
   async simulate(txBytes, protoResponse?: any, method: string = 'abci_query') {
     const params = {
