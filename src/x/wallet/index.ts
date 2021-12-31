@@ -55,7 +55,6 @@ export class Wallet {
     this.encryptionTool = encryptionTool;
     this.store = store;
   }
-  async listSavedWallets() {
   async listSavedWallets(): Promise<string[]> {
     const storedWallets = await this.store.getSavedWallets();
     return storedWallets;
