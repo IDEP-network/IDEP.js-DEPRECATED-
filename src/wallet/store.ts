@@ -1,6 +1,6 @@
 import Keyv from 'keyv';
 
-import isNode from '../../utils/is-node';
+import isNode from '../utils/is-node';
 
 export type WalletJson = any;
 export type StorageAdapter = any;
@@ -49,3 +49,14 @@ const storageFactory = () => {
 };
 
 export const Store = storageFactory();
+
+/*
+
+
+interface StorageContract {
+  store: StorageAdapter;
+  pickWallet: (name: string) => walletJson;
+  retrieveStoredWallets: () => walletJson[];
+  saveWallet: (wallet: any) => boolean;
+}
+*/

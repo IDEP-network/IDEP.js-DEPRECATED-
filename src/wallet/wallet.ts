@@ -1,46 +1,15 @@
 import {bech32} from 'bech32';
 
-import {CryptoStrategy, EncryptionTool} from '../../cryptography/encryption/crypto-strategy';
-import * as walletCreationTool from '../../cryptography/wallet-utils';
-import {EncryptedPrivateKey, EncryptedWallet} from '../../types/types';
+import {CryptoStrategy, EncryptionTool} from '../cryptography/encryption/encryption-strategy';
 import {Bech32Address, Bech32PublicKey, HexEncoded} from '../types/aliases';
+import {EncryptedPrivateKey, EncryptedWallet} from '../types/types';
 import {PersistentStorage, Store, WalletJson} from './store';
+import {WalletTools} from './wallet.tools';
 
 interface WalletDataForUser {
-  address: Bech32Address;
-  publicKey: Bech32PublicKey;
-  mnemonic?: string;
-}
-export class WalletUtilities {
-  static async generateWallet() {
-    const mnemonic = await walletCreationTool.generateMnemonic();
-    const {
-      privateKey,
-      publicKey,
-      address,
-    } = await WalletUtilities.generateFromSeed(mnemonic);
-    return { mnemonic, privateKey, publicKey, address };
-  }
-  static async recoverFromMnemonics(mnemonic: string) {
-    return WalletUtilities.generateFromSeed(mnemonic);
-  }
-  static async generateFromSeed(mnemonic: string) {
-    const privateKey = await walletCreationTool.generatePrivateKeyFromMnemonic(
-      mnemonic
-    );
-    const publicKey = walletCreationTool.derivePublicKeyFromPrivateKey(
-      privateKey
-    );
-    const address = await walletCreationTool.getAddressFromPublicKey(publicKey);
-    return { privateKey, publicKey, address };
-  }
-  static async recoverFromPrivateKey(privateKey: string) {
-    const publicKey = walletCreationTool.derivePublicKeyFromPrivateKey(
-      Buffer.from(privateKey, 'hex')
-    );
-    const address = await walletCreationTool.getAddressFromPublicKey(publicKey);
-    return { privateKey, publicKey, address };
-  }
+	address: Bech32Address;
+	publicKey: Bech32PublicKey;
+	mnemonic?: string;
 }
 
 export class Wallet {
@@ -61,7 +30,6 @@ export class Wallet {
   }
   async retrieveSavedWallet(name: string): Promise<WalletJson> {
     const wallet = await this.store.pickWallet(name);
-    console.log(wallet);
     const { address, crypto } = wallet;
     // TODO obvious lol
     const publicKey = wallet.pub_key || wallet.publicKey;
@@ -99,7 +67,7 @@ export class Wallet {
     await this.store.saveWallet(encryptedWallet.name, encryptedWallet);
   }
   async createNew(password: string, name?: string): Promise<WalletDataForUser> {
-    const walletPromise = WalletUtilities.generateWallet();
+    const walletPromise = WalletTools.generateWallet();
     const ramdomBytesPromise = this.encryptionTool.getRandomBytes(12);
     const promiseResults = await Promise.allSettled([
       walletPromise,
@@ -139,14 +107,14 @@ export class Wallet {
     password: string,
     mnemonic: string
   ): Promise<WalletDataForUser> {
-    const wallet = await WalletUtilities.recoverFromMnemonics(mnemonic);
+    const wallet = await WalletTools.recoverFromMnemonics(mnemonic);
     return this.handleRestoredWallet(wallet, password);
   }
   async restoreFromPrivateKey(
     privKey: HexEncoded,
     password: string
   ): Promise<WalletDataForUser> {
-    const wallet = await WalletUtilities.recoverFromPrivateKey(privKey);
+    const wallet = await WalletTools.recoverFromPrivateKey(privKey);
     return this.handleRestoredWallet(wallet, password);
   }
   async handleRestoredWallet(
