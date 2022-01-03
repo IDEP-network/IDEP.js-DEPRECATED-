@@ -1,6 +1,6 @@
-import {GeneralTxTools} from '../x/tx/general-tx-tools';
-import {Bech32Address, ProtoBuffObject, ProtoBuffType} from '../x/types/aliases';
-import {MsgType} from './msg-types';
+import {GeneralTxTools} from '../x/tx/general-tx.tools';
+import {Bech32Address, ProtoBufObject, ProtoBufType} from './aliases';
+import {MsgType} from './msg.types';
 import * as pbs from './proto';
 import {Coin} from './types';
 
@@ -34,15 +34,15 @@ export const queryParamsRequest = () => {
 export class MsgSend {
   value: MsgSendValue;
   type: MsgType;
-  private static _protoBuffType: ProtoBuffType = pbs.bank_tx_pb.MsgSend;
+  private static _protoBuffType: ProtoBufType = pbs.bank_tx_pb.MsgSend;
   constructor(message: MsgSendValue) {
     this.type = MsgType.MsgSend;
     this.value = message;
   }
-  static getProtoBuffType(): ProtoBuffType {
+  static getProtoBuffType(): ProtoBufType {
     return this._protoBuffType;
   }
-  protoBuffObject(): ProtoBuffObject {
+  protoBuffObject(): ProtoBufObject {
     let protoMsg = new pbs.bank_tx_pb.MsgSend();
     protoMsg.setFromAddress(this.value.fromAddress);
     protoMsg.setToAddress(this.value.toAddress);
@@ -56,15 +56,15 @@ export class MsgSend {
 export class MsgMultiSend {
   value: MsgMultiSendValue;
   type: MsgType;
-  private static _protoBuffType: ProtoBuffType = pbs.bank_tx_pb.MsgMultiSend;
+  private static _protoBuffType: ProtoBufType = pbs.bank_tx_pb.MsgMultiSend;
   constructor(message: MsgMultiSendValue) {
     this.type = MsgType.MsgMultiSend;
     this.value = message;
   }
-  static getProtoBuffType(): ProtoBuffType {
+  static getProtoBuffType(): ProtoBufType {
     return this._protoBuffType;
   }
-  protoBuffObject(): ProtoBuffObject {
+  protoBuffObject(): ProtoBufObject {
     let protoMsg = new pbs.bank_tx_pb.MsgMultiSend();
     this.value.inputs.forEach(el => {
       let input = new pbs.bank_tx_pb.Input();
