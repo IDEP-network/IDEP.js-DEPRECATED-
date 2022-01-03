@@ -1,7 +1,7 @@
 import {KdfParams} from '../../types/types';
 import isNode from '../../utils/is-node';
-import {WebCrypto} from './browser-strategy';
-import {NodeCrypto} from './node-strategy';
+import {WebCrypto} from './browser.strategy';
+import {NodeCrypto} from './node.strategy';
 
 export interface CryptoStrategy {
   getRandomBytes(length: number): Promise<Buffer | Uint8Array>;
