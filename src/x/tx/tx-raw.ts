@@ -1,10 +1,10 @@
 import Long from 'long';
 
-import { sha256 } from '../../cryptography/hashing';
+import {sha256} from '../../cryptography/hashing.tools';
+import {HexEncoded, ProtoBufBytes} from '../../types/aliases';
 import * as pbs from '../../types/proto';
-import { StdFee } from '../../types/types';
-import { GeneralTxTools } from '../tx/general-tx-tools';
-import { HexEncoded, ProtoBuffBytes } from './aliases';
+import {StdFee} from '../../types/types';
+import {GeneralTxTools} from './general-tx.tools';
 
 interface TxBody {
   messages: any[];
@@ -29,7 +29,7 @@ class TxBody {
     this.timeout_height = timeout_height;
     //this.extension_options = extension_options;
   }
-  protobuffEncoded() {
+  protobufEncoded() {
     let body = new pbs.tx_tx_pb.TxBody();
     const msgs = this.messages.map(msg => {
       return GeneralTxTools.createAny(
@@ -55,7 +55,7 @@ class SignerInfo {
     this.public_key = public_key;
     this.sequence = sequence;
   }
-  protobuffEncoded() {
+  protobufEncoded() {
     let singleSigner = new pbs.tx_tx_pb.ModeInfo.Single();
     singleSigner.setMode(pbs.signing_signing_pb.SignMode.SIGN_MODE_DIRECT);
     let modeInfo = new pbs.tx_tx_pb.ModeInfo();
@@ -76,11 +76,12 @@ class AuthInfo {
     this.signer_info = new SignerInfo(public_key, sequence);
     this.fee = fee;
   }
-  protobuffEncoded() {
+  protobufEncoded() {
     let feeModel = GeneralTxTools.createFee(this.fee.amount, this.fee.gas);
     let authInfo = new pbs.tx_tx_pb.AuthInfo();
-    authInfo.addSignerInfos(this.signer_info.protobuffEncoded());
+    authInfo.addSignerInfos(this.signer_info.protobufEncoded());
     authInfo.setFee(feeModel);
+    console.log(authInfo);
     return authInfo;
   }
 }
@@ -88,7 +89,7 @@ class AuthInfo {
 export class TxRaw {
   body: TxBody;
   auth_info: AuthInfo;
-  signatures: ProtoBuffBytes[];
+  signatures: ProtoBufBytes[];
   chainId: string = 'SanfordNetwork';
   account_number: number;
   constructor(body: TxBody, auth_info: AuthInfo, account_number: number) {
@@ -99,9 +100,9 @@ export class TxRaw {
   }
   getSignDoc = () => {
     let signDoc = new pbs.tx_tx_pb.SignDoc();
-    signDoc.setBodyBytes(this.body.protobuffEncoded().serializeBinary());
+    signDoc.setBodyBytes(this.body.protobufEncoded().serializeBinary());
     signDoc.setAuthInfoBytes(
-      this.auth_info.protobuffEncoded().serializeBinary()
+      this.auth_info.protobufEncoded().serializeBinary()
     );
     signDoc.setChainId(this.chainId);
     signDoc.setAccountNumber(Long.fromNumber(this.account_number) ?? null);
@@ -112,8 +113,8 @@ export class TxRaw {
   };
   getRaw = () => {
     let txRaw = new pbs.tx_tx_pb.TxRaw();
-    txRaw.setBodyBytes(this.body.protobuffEncoded().serializeBinary());
-    txRaw.setAuthInfoBytes(this.auth_info.protobuffEncoded().serializeBinary());
+    txRaw.setBodyBytes(this.body.protobufEncoded().serializeBinary());
+    txRaw.setAuthInfoBytes(this.auth_info.protobufEncoded().serializeBinary());
     this.signatures.forEach(el => {
       txRaw.addSignatures(new Uint8Array(Buffer.from(el, 'base64')));
     });
@@ -121,8 +122,8 @@ export class TxRaw {
   };
   getData = (): Uint8Array => {
     let tx = new pbs.tx_tx_pb.Tx();
-    tx.setBody(this.body.protobuffEncoded());
-    tx.setAuthInfo(this.auth_info.protobuffEncoded());
+    tx.setBody(this.body.protobufEncoded());
+    tx.setAuthInfo(this.auth_info.protobufEncoded());
     this.signatures.forEach(signature => {
       tx.addSignatures(new Uint8Array(Buffer.from(signature, 'base64')));
     });
@@ -143,11 +144,8 @@ export class TxFactory {
   }
   addAuthInfo(
     public_key: HexEncoded,
-    sequence?: number,
-    fee: StdFee = {
-      gas: '200000',
-      amount: [{ denom: 'idep', amount: '500' }],
-    }
+    sequence: number,
+    fee: StdFee,
   ) {
     this.auth_info = new AuthInfo(public_key, sequence, fee);
   }
