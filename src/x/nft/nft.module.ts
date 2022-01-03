@@ -1,4 +1,5 @@
 import {ClientInterface} from '../../client';
+import {Bech32Address, HexEncoded} from '../../types/aliases';
 import {
   MsgBurnNFT,
   MsgBurnNFTValue,
@@ -16,9 +17,8 @@ import {
   queryOwnerRequest,
   querySupplyRequest,
   TransferNftValue
-} from '../../types/nft';
-import {StdFee} from '../../types/types';
-import {Bech32Address, HexEncoded} from '../types/aliases';
+} from '../../types/nft-proto.types';
+import {StdFee, TxDetails} from '../../types/types';
 
 export class Nft {
   client: ClientInterface;
@@ -27,69 +27,44 @@ export class Nft {
   }
   async msgIssueDenom(
     msgValue: MsgIssueDenomValue,
-    baseTx: {
-      from: Bech32Address;
-      pub_key: HexEncoded;
-      gas?: string | undefined;
-      fee?: StdFee | undefined;
-      memo?: string | 'No memes for you';
-    } // TODO note
+    txDetails: TxDetails
   ) {
     const msgs: any[] = [new MsgIssueDenom(msgValue)];
-    return this.client.tx.buildSignSend(msgs, baseTx);
+    return this.client.tx.buildSignSend(msgs, txDetails);
   }
   async msgMintNFT(
     msgValue: NFTParams,
-    baseTx: {
+    txDetails: {
       from: Bech32Address;
       pub_key: HexEncoded;
-      gas?: string | undefined;
       fee?: StdFee | undefined;
       memo?: string | 'No memes for you';
     } // TODO note
   ) {
     const msgs: any[] = [new MsgMintNFT(msgValue)];
-    return this.client.tx.buildSignSend(msgs, baseTx);
+    return this.client.tx.buildSignSend(msgs, txDetails);
   }
   async msgEditNFT(
     msgValue: MsgEditNFTValue,
-    baseTx: {
-      from: Bech32Address;
-      pub_key: HexEncoded;
-      gas?: string | undefined;
-      fee?: StdFee | undefined;
-      memo?: string | 'No memes for you';
-    } // TODO note
+    txDetails: TxDetails
   ) {
     const msgs: any[] = [new MsgEditNFT(msgValue)];
-    return this.client.tx.buildSignSend(msgs, baseTx);
+    return this.client.tx.buildSignSend(msgs, txDetails);
   }
 
   async msgTransferNFT(
     msgValue: TransferNftValue,
-    baseTx: {
-      from: Bech32Address;
-      pub_key: HexEncoded;
-      gas?: string | undefined;
-      fee?: StdFee | undefined;
-      memo?: string | 'No memes for you';
-    } // TODO note
+    txDetails: TxDetails
   ) {
     const msgs: any[] = [new MsgTransferNFT(msgValue)];
-    return this.client.tx.buildSignSend(msgs, baseTx);
+    return this.client.tx.buildSignSend(msgs, txDetails);
   }
   async msgBurnNFT(
     msgValue: MsgBurnNFTValue,
-    baseTx: {
-      from: Bech32Address;
-      pub_key: HexEncoded;
-      gas?: string | undefined;
-      fee?: StdFee | undefined;
-      memo?: string | 'No memes for you';
-    } // TODO note
+    txDetails: TxDetails
   ) {
     const msgs: any[] = [new MsgBurnNFT(msgValue)];
-    return this.client.tx.buildSignSend(msgs, baseTx);
+    return this.client.tx.buildSignSend(msgs, txDetails);
   }
 
   async checkSupply(denomId?: string, owner?: string) {
