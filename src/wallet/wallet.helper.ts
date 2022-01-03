@@ -3,9 +3,9 @@ import {bech32} from 'bech32';
 import {BIP32Interface} from 'bip32';
 import {publicKeyCreate as secp256k1PublicKeyCreate} from 'secp256k1';
 
+import {ripemd160, sha256} from '../cryptography/hashing.tools';
 import {config} from '../utils/config';
 import isNode from '../utils/is-node';
-import {ripemd160, sha256} from './hashing';
 
 const bip32 = require('bip32') as typeof import('bip32');
 const bip39 = require('bip39') as typeof import('bip39');
@@ -40,8 +40,6 @@ export const verifyAddress = (
   if (length !== DECODED_ADDRESS_LENGTH) {
     errors = errors.concat('Address length is not valid.');
   }
-  console.log(errors);
-  console.log(decodedAddress);
   if (errors.length > 0) {
     const error = errors.join(' ');
     throw new Error(error);
@@ -58,6 +56,10 @@ export const generateMnemonic = async (): Promise<string> => {
 export const generateMasterKeyFromMnemonic = async (
   mnemonic: string
 ): Promise<BIP32Interface> => {
+  // throws if mnemonic is invalid
+  // if (!bip39.validateMnemonic(mnemonic)) {
+  //   throw new Error('Invalid mnemonic format'); // TO-DO custom error //type
+  // }
   const seed: Buffer = await bip39.mnemonicToSeed(mnemonic);
   return bip32.fromSeed(seed);
 };
