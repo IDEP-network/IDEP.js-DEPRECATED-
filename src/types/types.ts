@@ -1,4 +1,4 @@
-import {HexEncoded} from '../x/types/aliases';
+import {Bech32Address, HexEncoded} from './aliases';
 
 export interface JsonRpcResponse {
   id: string | number;
@@ -63,6 +63,15 @@ export interface TxSignatureMeta {
   account_number: string;
   chain_id: string;
   sequence: string;
+}
+
+export interface TxDetails {
+    from: Bech32Address;
+    password: string;
+    pub_key?: HexEncoded;
+    fee?: StdFee;
+    memo?: string;
+
 }
 
 export interface BaseTx {
