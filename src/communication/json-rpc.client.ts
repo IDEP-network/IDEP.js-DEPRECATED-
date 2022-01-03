@@ -1,8 +1,5 @@
-import {HexEncoded} from '../x/types/aliases';
-import {HttpClient} from './querying/HttpClient';
-
-const sleep = (milliseconds = 500) =>
-  new Promise(resolve => setTimeout(resolve, milliseconds));
+import {HexEncoded, ProtoBufObject, ProtoBufType} from '../types/aliases';
+import {HttpClient} from './http.client';
 
 export class JsonRpc {
   url: string;
@@ -23,10 +20,9 @@ export class JsonRpc {
       params,
     };
     const response: any = await this.http.post(data);
-    console.log(response);
-    return response; //Buffer.from(response.result.response.value, 'base64').toString();
+    return response;
   }
-  async abciQuery(path: string, query: any, protoResponse?: any) {
+  async abciQuery(path: string, query: ProtoBufObject, protoResponse?: ProtoBufType) {
     const params = {
       path, // remove emagic strings
       data: Buffer.from(query.serializeBinary()).toString('hex'),
@@ -43,7 +39,7 @@ export class JsonRpc {
     return decoded;
   }
   async send(
-    txBytes,
+    txBytes: ProtoBufObject,
     method: string = 'broadcast_tx_commit'
   ) {
     // TODO normalize return type
