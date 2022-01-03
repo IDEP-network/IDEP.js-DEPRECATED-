@@ -1,6 +1,5 @@
 import {ClientInterface} from '../../client';
-import {restClient} from '../../communication/querying/BaseQuery';
-import {queryAccountRequest, queryParamsRequest} from '../../types/auth';
+import {queryAccountRequest, queryParamsRequest} from '../../types/auth-proto.types';
 
 export class Auth {
   client: ClientInterface;
@@ -9,7 +8,7 @@ export class Auth {
     this.client = client;
   }
 
-  async baseTx(address: string): Promise<any> {
+  async getAccountData(address: string): Promise<any> {
     const accountInfo = await this.checkAccountInfo(address);
     const txMeta = {
       accountNumber: accountInfo.accountNumber,
@@ -19,12 +18,13 @@ export class Auth {
   }
   async restRequest(address: string): Promise<any> {
     try {
-      const response = await restClient.requestData('auth/accounts', address);
+      const response = await this.client.restClient.requestData('auth/accounts', address);
       console.log(response);
       const accountNumber = response.result.value.account_number;
+      const sequence = response.result.value?.sequence || 0;
       const newAccountInfo = {
         accountNumber,
-        sequence: 0,
+        sequence,
       };
       return newAccountInfo;
     } catch (err) {
