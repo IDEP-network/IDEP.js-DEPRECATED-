@@ -1,4 +1,5 @@
 import {ClientInterface} from '../../client';
+import {Bech32Address} from '../../types/aliases';
 import {
   InputOrOutput,
   MsgMultiSend,
@@ -8,9 +9,8 @@ import {
   queryBalanceRequest,
   queryParamsRequest,
   querySupplyOfRequest
-} from '../../types/bank';
-import {Coin, StdFee} from '../../types/types';
-import {Bech32Address, HexEncoded} from '../types/aliases';
+} from '../../types/bank-proto.types';
+import {Coin, TxDetails} from '../../types/types';
 
 interface SendTransfer {
   recipient: Bech32Address;
@@ -24,39 +24,26 @@ export class Bank {
   }
   async msgSend(
     transfer: SendTransfer,
-    baseTx: {
-      from: Bech32Address;
-      password: string;
-      pub_key?: HexEncoded;
-      gas?: string | undefined;
-      fee?: StdFee | undefined;
-      memo?: string | 'No memes for you';
-    } // TODO note
+    txDetails: TxDetails
   ) {
     // TODO validate addrresses
     const value = ({
       amount: transfer.amount,
       toAddress: transfer.recipient,
-      fromAddress: baseTx.from,
+      fromAddress: txDetails.from,
     } as unknown) as MsgSendValue;
     const msgs: any[] = [new MsgSend(value)];
-    return this.client.tx.buildSignSend(msgs, baseTx);
+    return this.client.tx.buildSignSend(msgs, txDetails);
   }
 
   async msgMultiSend(
     inputs: InputOrOutput[],
     outputs: InputOrOutput[],
-    baseTx: {
-      from: Bech32Address;
-      pub_key: HexEncoded;
-      gas?: string | undefined;
-      fee?: StdFee | undefined;
-      memo?: string | 'No memes for you';
-    } // TODO note
+    txDetails: TxDetails
   ) {
     // TODO validate addrresses
     const msgs: any[] = [new MsgMultiSend({ inputs, outputs })];
-    return this.client.tx.buildSignSend(msgs, baseTx);
+    return this.client.tx.buildSignSend(msgs, txDetails);
   }
   async checkBalance(address: string, denom: string) {
     const [query, protoResponse] = queryBalanceRequest(address, denom);
