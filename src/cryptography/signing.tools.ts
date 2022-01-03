@@ -1,7 +1,7 @@
+import {Base64Encoded, HexEncoded} from '../types/aliases';
 import {StdSignature} from '../types/types';
-import {StdSignMsg} from '../x/tx';
-import {Base64Encoded, HexEncoded} from '../x/types/aliases';
-import {sha256} from './hashing';
+import {StdSignMsg} from '../x/tx/tx.module';
+import {sha256} from './hashing.tools';
 
 const secp256k1 = require('secp256k1') as typeof import('secp256k1');
 
@@ -12,7 +12,7 @@ interface KeyPair {
   priv_key: string;
 }
 
-export class SigningTool {
+export class SigningTools {
   hexToBytes;
   constructor(hexToBytes) {
     this.hexToBytes = hexToBytes;
@@ -138,7 +138,7 @@ const hexToBuffer = (hex: HexEncoded): ArrayBuffer => {
 };
 
 const signingToolFactory = () => {
-  const tool = new SigningTool(hexToBuffer);
+  const tool = new SigningTools(hexToBuffer);
   return tool;
 };
 
