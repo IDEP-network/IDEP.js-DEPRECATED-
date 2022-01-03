@@ -1,7 +1,7 @@
 import Long from 'long';
 
+import {HexEncoded, ProtoBufObject} from '../../types/aliases';
 import * as pbs from '../../types/proto';
-import {HexEncoded, ProtoBuffObject} from '../types/aliases';
 
 interface Coin {
   denom: string;
@@ -9,11 +9,10 @@ interface Coin {
 }
 
 export class GeneralTxTools {
-  static createAny(type: string, value: any): ProtoBuffObject {
+  static createAny(type: string, value: any): ProtoBufObject {
     let anyPb = new pbs.any_pb.Any();
     anyPb.setTypeUrl(`/${type}`);
-    anyPb.setValue(value); //.serializeBinary());
-    console.log(anyPb.serializeBinary());
+    anyPb.setValue(value);
     return anyPb;
   }
   static createCoin({ denom, amount }: Coin) {
@@ -23,21 +22,19 @@ export class GeneralTxTools {
     return coin;
   }
 
-  static createFee(amounts: Coin[], gas: any): ProtoBuffObject {
+  static createFee(amounts: Coin[], gas: any): ProtoBufObject {
     let fee = new pbs.tx_tx_pb.Fee();
     fee.setGasLimit(Long.fromString(gas));
-
     amounts.forEach(el => {
       const coin = GeneralTxTools.createCoin(el);
       fee.addAmount(coin);
     });
-
     return fee;
   }
-  static populatePubKey(pubKey: HexEncoded): ProtoBuffObject {
+  static populatePubKey(pubKey: HexEncoded): ProtoBufObject {
     // TODO support other types of keys
     const pbech = GeneralTxTools.getHexPubkey(pubKey);
-    const pubKeyProto: ProtoBuffObject = new pbs.crypto_secp256k1_keys_pb.PubKey();
+    const pubKeyProto: ProtoBufObject = new pbs.crypto_secp256k1_keys_pb.PubKey();
     pubKeyProto.setKey(new Uint8Array(pbech));
     return GeneralTxTools.createAny(
       'cosmos.crypto.secp256k1.PubKey',
