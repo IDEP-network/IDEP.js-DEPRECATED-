@@ -1,17 +1,9 @@
-import {KdfParams} from '../../types/types';
 import isNode from '../../utils/is-node';
 import {WebCrypto} from './browser.strategy';
+import {CryptoStrategy} from './crypto-strategy.interface';
 import {NodeCrypto} from './node.strategy';
 
-export interface CryptoStrategy {
-  getRandomBytes(length: number): Promise<Buffer | Uint8Array>;
-  kdfMethod(
-    password: string,
-    salt: string | any
-  ): Promise<Buffer | ArrayBuffer>;
-  encrypt(message: string, password: string): Promise<any>;
-  decrypt(encryptedphrase: any, password: string): Promise<string>;
-}
+
 
 const encryptionToolFactory = () => {
   if (isNode) {
@@ -45,13 +37,3 @@ export class WalletEncrptor {
     return decrypt;
   }
 }
-
-export const getDefaultKdfParams = (): KdfParams => {
-  const kdfParams: KdfParams = {
-    keylen: 32,
-    N: 16384,
-    r: 8,
-    p: 1,
-  };
-  return kdfParams;
-};
