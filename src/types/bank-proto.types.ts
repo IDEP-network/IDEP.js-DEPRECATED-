@@ -26,7 +26,7 @@ export const querySupplyOfRequest = (denom: string) => {
   return [query, pbs.bank_query_pb.QuerySupplyOfResponse];
 };
 
-export const queryParamsRequest = () => {
+export const queryBankParamsRequest = () => {
   const query = new pbs.bank_query_pb.QueryParamsRequest();
   return [query, pbs.bank_query_pb.QueryParamsResponse];
 };
