@@ -4,7 +4,7 @@ export type APIParams = Record<string, string | number | null | undefined>;
 
 export class HttpClient {
   axios: AxiosInstance;
-  constructor(baseURL: string = '') {
+  constructor(baseURL: string) {
     this.axios = Axios.create({
       baseURL,
       headers: {
@@ -23,3 +23,5 @@ export class HttpClient {
     return this.axios.post('/', data).then(d => d.data);
   }
 }
+
+export interface HttpClientInterface extends HttpClient {}
