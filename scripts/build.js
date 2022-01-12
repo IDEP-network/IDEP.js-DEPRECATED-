@@ -70,4 +70,14 @@ fs.copyFileSync(
   path.resolve('dist', 'node', 'index.d.ts'),
 );
 
+var data = fs.readFileSync(path.resolve('dist', 'browser', 'index.js')).toString().split("\n");
+const dataToBeSearched = data.slice(0, 12);
+const match = dataToBeSearched.join('\n').match(/import { Buffer as (Buffer\$\d) } from 'buffer\/'/);
+data.splice(12, 0, `window.Buffer = ${match[1]}`);
+var text = data.join("\n");
+
+fs.writeFile(path.resolve('dist', 'browser', 'index.js'), text, function (err) {
+  if (err) return console.log(err);
+});
+
 console.log('Build finished!');
