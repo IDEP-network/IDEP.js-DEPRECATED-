@@ -5,25 +5,23 @@ import {publicKeyCreate as secp256k1PublicKeyCreate} from 'secp256k1';
 
 import {ripemd160, sha256} from '../cryptography/hashing.tools';
 import {config} from '../utils/config';
-import isNode from '../utils/is-node';
 
 const bip32 = require('bip32') as typeof import('bip32');
 const bip39 = require('bip39') as typeof import('bip39');
-const crypto = require('crypto') as typeof import('crypto');
 
-if (isNode) {
-  var Buffer = require('buffer').Buffer;
+if (process.envType === 'browser') {
+  var Buffer = require('buffer/').Buffer;
+  var getRandomBytes = (length: number): any => {
+    const uintarr = window.crypto.getRandomValues(new Uint8Array(length));
+    return Buffer.from(uintarr);
+  };
 } else {
   var Buffer = require('buffer/').Buffer;
+  const crypto = require('crypto') as typeof import('crypto');
+  var getRandomBytes = (length: number): any => {
+    return crypto.randomBytes(length);
+  };
 }
-export const getRandomBytes = (length: number): Promise<Buffer> => {
-  return new Promise((resolve, reject) => {
-    crypto.randomBytes(length, (err, bytes) => {
-      if (err) reject(err);
-      else resolve(bytes);
-    });
-  });
-};
 
 export const verifyAddress = (
   address,
@@ -88,19 +86,19 @@ export const encodeIntoBech32Format = (
   return bech32.encode(prefix, words);
 };
 
-export const getAddressFromPublicKey = async (
+export const getAddressFromPublicKey = (
   key: Buffer,
   prefix: string = config.Bech32Prefix
-): Promise<string> => {
-  const message = await sha256(key);
-  const hash = await ripemd160(message);
+): string => {
+  const message = sha256(key);
+  const hash = ripemd160(message);
   const words = bech32.toWords(hash);
   return bech32.encode(prefix, words);
 };
 
-export const getAddressFromPrivateKey = async (
+export const getAddressFromPrivateKey = (
   key: Buffer,
   prefix: string = config.Bech32Prefix
-): Promise<string> => {
+): string => {
   return getAddressFromPublicKey(derivePublicKeyFromPrivateKey(key), prefix);
 };
