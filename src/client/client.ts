@@ -57,7 +57,7 @@ class Client {
   }
 }
 
-export const clientFactory = (
+export const createNewClient = (
   instanceConfig?: Partial<ClientInstanceConfig>
 ): Client => {
   console.log(process.envType);

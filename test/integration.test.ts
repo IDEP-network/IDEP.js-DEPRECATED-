@@ -1,9 +1,12 @@
-import {ClientInterface, clientFactory} from '../src/client/client';
+import {createNewClient, ClientInterface} from '../src/client/client';
 
-describe('Client', () => {
+/**
+ * @jest-environment jsdom
+ */
+describe.skip('Client', () => {
   let client: ClientInterface;
   beforeAll(() => {
-    client = clientFactory();
+    client = createNewClient();
   });
   describe('Wallet tests', () => {
     describe('Wallet can be createed, persisted, and retrieved', () => {
@@ -46,28 +49,31 @@ describe('Client', () => {
     });
   });
 
-		describe('Restore from  mnemonic phrase and send MsgSend tx', () => {
-			it('Restore from mnemonic phrase', async () => {
-				await client.wallet.restoreFromSeed('password',  'power thing inmate obscure rubber frequent grit hair below museum notable reopen spoon prize family caught axis host');
-				console.log(client.wallet);
-			})
-			it('Send MsgSend tx', async () => {
-				const txResult = await client.bank.msgSend(
-					{
-							recipient: 'idep126dfeu0d6awmdjy29e4f04eg0g3kvcpz9dazru',
-							amount: [{ denom: 'idep', amount: '25' }],
-					},
-					{
-							from: client.wallet.address,
-							pub_key: client.wallet.publicKey,
-							fee: {
-									gas: '7000',
-									amount: [{ denom: 'idep', amount: '700' }],
-							},
-							password: 'password',
-					}
-			);
-			console.log(txResult);
-			})
-		})
+  describe('Restore from  mnemonic phrase and send MsgSend tx', () => {
+    it('Restore from mnemonic phrase', async () => {
+      await client.wallet.restoreFromSeed(
+        'password',
+        'power thing inmate obscure rubber frequent grit hair below museum notable reopen spoon prize family caught axis host'
+      );
+      console.log(client.wallet);
+    });
+    it('Send MsgSend tx', async () => {
+      const txResult = await client.bank.msgSend(
+        {
+          recipient: 'idep126dfeu0d6awmdjy29e4f04eg0g3kvcpz9dazru',
+          amount: [{ denom: 'idep', amount: '25' }],
+        },
+        {
+          from: client.wallet.address,
+          pub_key: client.wallet.publicKey,
+          fee: {
+            gas: '7000',
+            amount: [{ denom: 'idep', amount: '700' }],
+          },
+          password: 'password',
+        }
+      );
+      console.log(txResult);
+    });
+  });
 });
