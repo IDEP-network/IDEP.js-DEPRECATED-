@@ -1,15 +1,16 @@
 import {bech32} from 'bech32';
 
-import {CryptoStrategy, EncryptionTool} from '../cryptography/encryption/encryption-strategy';
+import {CryptoStrategy} from '../cryptography/encryption/crypto-strategy.interface';
+import {EncryptionTool} from '../cryptography/encryption/encryption-strategy';
 import {Bech32Address, Bech32PublicKey, HexEncoded} from '../types/aliases';
 import {EncryptedPrivateKey, EncryptedWallet} from '../types/types';
 import {PersistentStorage, Store, WalletJson} from './store';
 import {WalletTools} from './wallet.tools';
 
 interface WalletDataForUser {
-	address: Bech32Address;
-	publicKey: Bech32PublicKey;
-	mnemonic?: string;
+  address: Bech32Address;
+  publicKey: Bech32PublicKey;
+  mnemonic?: string;
 }
 
 export class Wallet {
@@ -67,17 +68,10 @@ export class Wallet {
     await this.store.saveWallet(encryptedWallet.name, encryptedWallet);
   }
   async createNew(password: string, name?: string): Promise<WalletDataForUser> {
-    const walletPromise = WalletTools.generateWallet();
-    const ramdomBytesPromise = this.encryptionTool.getRandomBytes(12);
-    const promiseResults = await Promise.allSettled([
-      walletPromise,
-      ramdomBytesPromise,
-    ]);
-    const [wallet, ramdomBytes] = promiseResults.map(
-      el => (el as PromiseFulfilledResult<any>).value
-    );
+    const wallet = await WalletTools.generateWallet();
+    const ramdomBytes = this.encryptionTool.getRandomBytes(12);
     const { privateKey, address, mnemonic } = wallet;
-    const publicKeyRaw = wallet.publicKey || wallet.pub_key;
+    const publicKeyRaw = wallet.publicKey;
     const encryptedPrivate = await this.encryptionTool.encrypt(
       privateKey.toString('hex'),
       password
