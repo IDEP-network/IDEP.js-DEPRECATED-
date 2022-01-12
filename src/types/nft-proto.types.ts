@@ -45,15 +45,15 @@ export const queryNFTRequest = (denomId: string, tokenId: string) => {
 export class MsgIssueDenom {
   value: MsgIssueDenomValue;
   type: MsgType;
-  private static _protoBuffType: ProtoBufType = pbs.nft_tx_pb.MsgIssueDenom;
+  private static _protobufType: ProtoBufType = pbs.nft_tx_pb.MsgIssueDenom;
   constructor(message: MsgIssueDenomValue) {
     this.type = MsgType.MsgIssueDenom;
     this.value = message;
   }
-  static getProtoBuffType(): ProtoBufType {
-    return this._protoBuffType;
+  static getprotobufType(): ProtoBufType {
+    return this._protobufType;
   }
-  protoBuffObject(): ProtoBufObject {
+  protobufObject(): ProtoBufObject {
     let protoMsg = new pbs.nft_tx_pb.MsgIssueDenom();
     protoMsg.setId(this.value.id);
     protoMsg.setName(this.value.name);
@@ -66,15 +66,15 @@ export class MsgIssueDenom {
 export class MsgMintNFT {
   value: NFTParams;
   type: MsgType;
-  private static _protoBuffType: ProtoBufType = pbs.nft_tx_pb.MsgMintNFT;
+  private static _protobufType: ProtoBufType = pbs.nft_tx_pb.MsgMintNFT;
   constructor(message: NFTParams) {
     this.type = MsgType.MsgMintNFT;
     this.value = message;
   }
-  static getProtoBuffType(): ProtoBufType {
-    return this._protoBuffType;
+  static getprotobufType(): ProtoBufType {
+    return this._protobufType;
   }
-  protoBuffObject(): ProtoBufObject {
+  protobufObject(): ProtoBufObject {
     let protoMsg = new pbs.nft_tx_pb.MsgMintNFT();
     protoMsg.setId(this.value.id);
     protoMsg.setDenomId(this.value.denomId);
@@ -90,7 +90,7 @@ export class MsgMintNFT {
 export class MsgEditNFT {
   value: MsgEditNFTValue;
   type: MsgType;
-  private static _protoBuffType: ProtoBufType = pbs.nft_tx_pb.MsgEditNFT;
+  private static _protobufType: ProtoBufType = pbs.nft_tx_pb.MsgEditNFT;
   private doNotModifyFlag: string = '[do-not-modify]';
   defaults: NFTDefaultBlankFieldValues = {
     name: this.doNotModifyFlag,
@@ -101,10 +101,10 @@ export class MsgEditNFT {
     this.type = MsgType.MsgEditNFT;
     this.value = { ...this.defaults, ...message };
   }
-  static getProtoBuffType(): ProtoBufType {
-    return this._protoBuffType;
+  static getprotobufType(): ProtoBufType {
+    return this._protobufType;
   }
-  protoBuffObject(): ProtoBufObject {
+  protobufObject(): ProtoBufObject {
     let protoMsg = new pbs.nft_tx_pb.MsgEditNFT();
     protoMsg.setId(this.value.id);
     protoMsg.setDenomId(this.value.denomId);
@@ -119,7 +119,7 @@ export class MsgEditNFT {
 export class MsgTransferNFT {
   value: TransferNftValue;
   type: MsgType;
-  private static _protoBuffType: ProtoBufType = pbs.nft_tx_pb.MsgTransferNFT;
+  private static _protobufType: ProtoBufType = pbs.nft_tx_pb.MsgTransferNFT;
   private doNotModifyFlag: string = '[do-not-modify]';
   defaults: NFTDefaultBlankFieldValues = {
     name: this.doNotModifyFlag,
@@ -130,10 +130,10 @@ export class MsgTransferNFT {
     this.type = MsgType.MsgTransferNFT;
     this.value = { ...this.defaults, ...message };
   }
-  static getProtoBuffType(): ProtoBufType {
-    return this._protoBuffType;
+  static getprotobufType(): ProtoBufType {
+    return this._protobufType;
   }
-  protoBuffObject(): ProtoBufObject {
+  protobufObject(): ProtoBufObject {
     let protoMsg = new pbs.nft_tx_pb.MsgTransferNFT();
     protoMsg.setId(this.value.id);
     protoMsg.setDenomId(this.value.denomId);
@@ -149,15 +149,15 @@ export class MsgTransferNFT {
 export class MsgBurnNFT {
   value: MsgBurnNFTValue;
   type: MsgType;
-  private static _protoBuffType: ProtoBufType = pbs.nft_tx_pb.MsgBurnNFT;
+  private static _protobufType: ProtoBufType = pbs.nft_tx_pb.MsgBurnNFT;
   constructor(message: MsgBurnNFTValue) {
     this.type = MsgType.MsgBurnNFT;
     this.value = message;
   }
-  static getProtoBuffType(): ProtoBufType {
-    return this._protoBuffType;
+  static getprotobufType(): ProtoBufType {
+    return this._protobufType;
   }
-  protoBuffObject(): ProtoBufObject {
+  protobufObject(): ProtoBufObject {
     let protoMsg = new pbs.nft_tx_pb.MsgBurnNFT();
     protoMsg.setId(this.value.id);
     protoMsg.setDenomId(this.value.denomId);
