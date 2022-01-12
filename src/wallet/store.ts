@@ -6,9 +6,9 @@ export type StorageAdapter = any;
 export class PersistentStorage {
   store: StorageAdapter;
   constructor(storage) {
-    this.store = storage;
+    this.store = storage; // either wrapper over localStorage in browser environment or keyv instance in node
   }
-  async getSavedWallets() {
+  async getSavedWallets(): Promise<string[]> {
     const wallets = await this.store.get('wallets');
     if (!wallets) {
       return [];

@@ -24,7 +24,7 @@ if (process.envType === 'browser') {
 }
 
 export const verifyAddress = (
-  address,
+  address: string,
   prefix: string = config.Bech32Prefix
 ) => {
   const DECODED_ADDRESS_LENGTH = 20;
@@ -72,7 +72,7 @@ export const generatePrivateKeyFromMnemonic = async (
   return child.privateKey;
 };
 
-export const derivePublicKeyFromPrivateKey = (privateKey: Buffer): any => {
+export const derivePublicKeyFromPrivateKey = (privateKey: Buffer): Buffer => {
   const privateKeyBytes = bufferToBytes(privateKey);
   const publicKey = secp256k1PublicKeyCreate(privateKeyBytes, true);
 

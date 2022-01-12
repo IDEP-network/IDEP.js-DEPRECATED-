@@ -1,18 +1,15 @@
-import {HexEncoded, ProtoBufObject, ProtoBufType} from '../types/aliases';
-import {HttpClient} from './http.client';
+import {Base64Encoded, HexEncoded, ProtoBufObject, ProtoBufType} from '../types/aliases';
+import {HttpClient, HttpClientInterface} from './http.client';
 
 export class JsonRpc {
   url: string;
-  http: HttpClient;
-  constructor(
-    httpClient,
-    httpUrl: string = 'http://159.89.84.111:26657'
-  ) {
+  http: HttpClientInterface;
+  constructor(httpClient: typeof HttpClient, httpUrl: string) {
     this.url = httpUrl;
     this.http = new httpClient(this.url);
   }
   // meethod - enum
-  async request(method: string, params: any) {
+  async request(method: string, params: QueryParams | TxParams) {
     const data = {
       jsonrpc: '2.0',
       id: 'jsonrpc-client', // i think so?
@@ -22,8 +19,12 @@ export class JsonRpc {
     const response: any = await this.http.post(data);
     return response;
   }
-  async abciQuery(path: string, query: ProtoBufObject, protoResponse?: ProtoBufType) {
-    const params = {
+  async abciQuery(
+    path: string,
+    query: ProtoBufObject,
+    protoResponse?: ProtoBufType
+  ) {
+    const params: QueryParams = {
       path, // remove emagic strings
       data: Buffer.from(query.serializeBinary()).toString('hex'),
     };
@@ -38,16 +39,13 @@ export class JsonRpc {
       : JSON.parse(Buffer.from(value, 'base64').toString());
     return decoded;
   }
-  async send(
-    txBytes: ProtoBufObject,
-    method: string = 'broadcast_tx_commit'
-  ) {
+  async send(txBytes: ProtoBufObject, method: string = 'broadcast_tx_commit') {
     // TODO normalize return type
-    const params = {
+    const params: TxParams = {
       tx: Buffer.from(txBytes, 'binary').toString('base64'),
     };
     const response = await this.request(method, params);
-    if(method !== 'broadcast_tx_commit') {
+    if (method !== 'broadcast_tx_commit') {
       const {
         result: { hash },
       } = response;
@@ -55,21 +53,19 @@ export class JsonRpc {
     }
     const {
       result: {
-        deliver_tx: {
-          log
-        }
-      }
+        deliver_tx: { log },
+      },
     } = response;
     return log;
   }
-  async checkTx(txHash: HexEncoded){
+  async checkTx(txHash: HexEncoded) {
     // TODO improve
     const fetchedTx = await this.http.get(`/tx?hash=0x${txHash.toUpperCase()}`);
-    const {result} = fetchedTx;
+    const { result } = fetchedTx;
     return result;
   }
   async simulate(txBytes, protoResponse?: any, method: string = 'abci_query') {
-    const params = {
+    const params: QueryParams = {
       path: '/app/simulate',
       data: `${Buffer.from(txBytes, 'binary').toString('hex')}`,
     };
@@ -85,4 +81,13 @@ export class JsonRpc {
       : JSON.parse(Buffer.from(value, 'base64').toString());
     return decoded;
   }
+}
+
+interface QueryParams {
+  path: string;
+  data: HexEncoded;
+}
+
+interface TxParams {
+  tx: Base64Encoded;
 }

@@ -1,9 +1,9 @@
-import {HttpClient} from './http.client';
+import {HttpClient, HttpClientInterface} from './http.client';
 
 export class RestClient {
   restApiUrl: string;
-  q: HttpClient;
-  constructor(restCli, restApiUrl: string = 'http://159.89.84.111:1317/') {
+  q: HttpClientInterface;
+  constructor(restCli: typeof HttpClient, restApiUrl: string) {
     this.restApiUrl = restApiUrl;
     this.q = new restCli(this.restApiUrl);
   }
