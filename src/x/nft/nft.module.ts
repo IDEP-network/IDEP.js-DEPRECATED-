@@ -1,4 +1,4 @@
-import {ClientInterface} from '../../client';
+import {ClientInterface} from '../../client/client';
 import {Bech32Address, HexEncoded} from '../../types/aliases';
 import {
   MsgBurnNFT,

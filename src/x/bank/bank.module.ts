@@ -1,4 +1,4 @@
-import {ClientInterface} from '../../client';
+import {ClientInterface} from '../../client/client';
 import {Bech32Address} from '../../types/aliases';
 import {
   InputOrOutput,
@@ -7,7 +7,7 @@ import {
   MsgSendValue,
   queryAllBalancesRequest,
   queryBalanceRequest,
-  queryParamsRequest,
+  queryBankParamsRequest,
   querySupplyOfRequest
 } from '../../types/bank-proto.types';
 import {Coin, TxDetails} from '../../types/types';
@@ -74,7 +74,7 @@ export class Bank {
   }
 
   async checkParams() {
-    const [query, protoResponse] = queryParamsRequest();
+    const [query, protoResponse] = queryBankParamsRequest();
     const params = await this.client.rpc.abciQuery(
       '/cosmos.bank.v1beta1.Query/Params', // remove emagic strings
       query,

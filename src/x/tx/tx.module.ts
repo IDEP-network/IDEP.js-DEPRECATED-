@@ -1,4 +1,6 @@
-import {ClientInterface} from '../../client';
+import {Buffer} from 'buffer/';
+
+import {ClientInterface} from '../../client/client';
 import {SigningTools} from '../../cryptography/signing.tools';
 import {HexEncoded, ProtoBufObject} from '../../types/aliases';
 import {StdFee, TxDetails} from '../../types/types';

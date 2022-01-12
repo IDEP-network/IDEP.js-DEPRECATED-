@@ -1,5 +1,5 @@
-import {ClientInterface} from '../../client';
-import {queryAccountRequest, queryParamsRequest} from '../../types/auth-proto.types';
+import {ClientInterface} from '../../client/client';
+import {queryAccountRequest, queryAuthParamsRequest} from '../../types/auth-proto.types';
 
 export class Auth {
   client: ClientInterface;
@@ -60,7 +60,7 @@ export class Auth {
     }
   }
   async checkAuthParams(): Promise<AuthParams> {
-    const [query, protoResponse] = queryParamsRequest();
+    const [query, protoResponse] = queryAuthParamsRequest();
     const params = await this.client.rpc.abciQuery(
       '/cosmos.auth.v1beta1.Query/Params', // remove emagic strings
       query,
