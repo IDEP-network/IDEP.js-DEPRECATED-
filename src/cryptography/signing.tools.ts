@@ -1,3 +1,5 @@
+import {Buffer} from 'buffer/';
+
 import {Base64Encoded, HexEncoded} from '../types/aliases';
 import {StdSignature} from '../types/types';
 import {StdSignMsg} from '../x/tx/tx.module';
@@ -6,7 +8,6 @@ import {sha256} from './hashing.tools';
 const secp256k1 = require('secp256k1') as typeof import('secp256k1');
 
 const tendermintBelt = require('@tendermint/belt') as typeof import('@tendermint/belt');
-
 interface KeyPair {
   pub_key: string;
   priv_key: string;
@@ -48,7 +49,7 @@ export class SigningTools {
     priv_key: Uint8Array
   ): Promise<Base64Encoded> => {
     // TODO standardize the params
-    const msgHashed = await sha256(signDoc);
+    const msgHashed = sha256(signDoc);
     const msgHasheedUintArr = new Uint8Array(msgHashed);
     const { signature } = secp256k1.ecdsaSign(msgHasheedUintArr, priv_key);
     return Buffer.from(signature).toString('base64');
@@ -82,14 +83,14 @@ export class SigningTools {
     bytes: Uint8Array,
     key: Uint8Array
   ): Promise<Uint8Array> => {
-    const hash = await sha256(bytes);
+    const hash = sha256(bytes);
     const uintArr = new Uint8Array(hash);
     const { signature } = secp256k1.ecdsaSign(uintArr, key);
     return signature;
   };
   verifySignedBytes = async (signMsg, signature, pub_key): Promise<boolean> => {
     const bytes = tendermintBelt.toCanonicalJSONBytes(signMsg);
-    const hash = await sha256(bytes);
+    const hash = sha256(bytes);
     const uintArr = new Uint8Array(hash);
 
     return secp256k1.ecdsaVerify(signature, uintArr, pub_key);
@@ -137,9 +138,7 @@ const hexToBuffer = (hex: HexEncoded): ArrayBuffer => {
   return array.buffer;
 };
 
-const signingToolFactory = () => {
+export const signingToolFactory = () => {
   const tool = new SigningTools(hexToBuffer);
   return tool;
 };
-
-export default signingToolFactory();
