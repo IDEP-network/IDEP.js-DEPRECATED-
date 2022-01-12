@@ -1,18 +1,15 @@
-import isNode from '../../utils/is-node';
 import {WebCrypto} from './browser.strategy';
 import {CryptoStrategy} from './crypto-strategy.interface';
 import {NodeCrypto} from './node.strategy';
 
-
-
 const encryptionToolFactory = () => {
-  if (isNode) {
-    const crypto = require('crypto') as typeof import('crypto');
-    return new NodeCrypto(crypto);
-  } else {
+  if (process.envType === 'browser') {
     const crypto = window.crypto.subtle;
     const getRandomBytes = window.crypto.getRandomValues;
     return new WebCrypto(crypto, getRandomBytes);
+  } else {
+    const crypto = require('crypto') as typeof import('crypto');
+    return new NodeCrypto(crypto);
   }
 };
 
@@ -24,7 +21,7 @@ export class WalletEncrptor {
     this.strategy = strategy;
   }
   async getRandomBytes(length: number): Promise<Buffer | Uint8Array> {
-    const bytes = await this.strategy.getRandomBytes(length);
+    const bytes = this.strategy.getRandomBytes(length);
     return bytes;
   }
 

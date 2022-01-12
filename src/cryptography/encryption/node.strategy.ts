@@ -10,13 +10,8 @@ export class NodeCrypto implements CryptoStrategy {
   constructor(crypto: any) {
     this.crypto = crypto;
   }
-  public async getRandomBytes(length: number): Promise<Buffer> {
-    return new Promise((resolve, reject) => {
-      this.crypto.randomBytes(length, (err, bytes) => {
-        if (err) reject(err);
-        else resolve(bytes);
-      });
-    });
+  getRandomBytes(length: number): Buffer {
+    return this.crypto.randomBytes(length);
   }
   public async kdfMethod(
     password: string,

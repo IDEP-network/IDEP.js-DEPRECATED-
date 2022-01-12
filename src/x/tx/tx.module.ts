@@ -26,7 +26,9 @@ export class Tx {
 
   buildSignSend = async (msgs: any[], txDetails: any) => {
     const unsignedTxRaw = await this.createTxRaw(msgs, txDetails);
-    const privateKey = await this.client.wallet.getPrivateKey(txDetails.password);
+    const privateKey = await this.client.wallet.getPrivateKey(
+      txDetails.password
+    );
     const signature = await this.sign(
       unsignedTxRaw.getSignDoc(),
       new Uint8Array(Buffer.from(privateKey, 'hex'))
@@ -55,6 +57,6 @@ export interface StdSignMsg {
   pub_key: HexEncoded;
 }
 
-const isObjectEmpty = (obj) => {
-    return Object.keys(obj).length === 0;
-}
+const isObjectEmpty = obj => {
+  return Object.keys(obj).length === 0;
+};
