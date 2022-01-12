@@ -97,13 +97,13 @@ export interface StdSignature {
   pub_key: any;
 }
 
-export interface Tx {
+export interface ITx {
   message: Message[];
   fee: StdFee;
   memo: string;
 }
 
-export interface StdTx extends Tx {
+export interface StdTx extends ITx {
   signatures?: StdSignature[];
 }
 
