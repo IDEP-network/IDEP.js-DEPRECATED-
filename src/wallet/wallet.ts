@@ -5,7 +5,7 @@ import {EncryptionTool} from '../cryptography/encryption/encryption-strategy';
 import {Bech32Address, Bech32PublicKey, HexEncoded} from '../types/aliases';
 import {EncryptedPrivateKey, EncryptedWallet} from '../types/types';
 import {PersistentStorage, Store, WalletJson} from './store';
-import {WalletTools} from './wallet.tools';
+import {WalletRaw, WalletTools} from './wallet.tools';
 
 interface WalletDataForUser {
   address: Bech32Address;
@@ -94,7 +94,9 @@ export class Wallet {
       encryptedWallet
     );
     await Promise.all([storePromise, persistPromise]);
-    const publicKey = this.formatPublicKeyForUserInteraction(publicKeyRaw);
+    const publicKey = this.formatPublicKeyForUserInteraction(
+      publicKeyRaw.toString('hex')
+    );
     return { mnemonic, publicKey, address };
   }
   async restoreFromSeed(
@@ -112,7 +114,7 @@ export class Wallet {
     return this.handleRestoredWallet(wallet, password);
   }
   async handleRestoredWallet(
-    wallet,
+    wallet: WalletRaw,
     password: string
   ): Promise<WalletDataForUser> {
     const { privateKey, publicKey: publicKeyRaw, address } = wallet;

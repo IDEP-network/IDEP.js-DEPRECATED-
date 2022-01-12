@@ -8,7 +8,7 @@ export class Auth {
     this.client = client;
   }
 
-  async getAccountData(address: string): Promise<any> {
+  async getAccountData(address: string): Promise<AccountMeta> {
     const accountInfo = await this.checkAccountInfo(address);
     const txMeta = {
       accountNumber: accountInfo.accountNumber,
@@ -16,9 +16,12 @@ export class Auth {
     };
     return txMeta;
   }
-  async restRequest(address: string): Promise<any> {
+  async restRequest(address: string): Promise<AccountMeta> {
     try {
-      const response = await this.client.restClient.requestData('auth/accounts', address);
+      const response = await this.client.restClient.requestData(
+        'auth/accounts',
+        address
+      );
       console.log(response);
       const accountNumber = response.result.value.account_number;
       const sequence = response.result.value?.sequence || 0;
@@ -78,6 +81,11 @@ export class Auth {
     return accountInfo;
   }
 }
+
+type AccountMeta = {
+  accountNumber: number;
+  sequence: number;
+};
 
 type AccountInfo = {
   address: string;
