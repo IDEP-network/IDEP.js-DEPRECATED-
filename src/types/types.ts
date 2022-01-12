@@ -1,3 +1,5 @@
+import {Bech32Address, HexEncoded} from './aliases';
+
 export interface JsonRpcResponse {
   id: string | number;
   jsonrpc: string;
@@ -49,7 +51,7 @@ export interface Coin {
 
 export interface StdFee {
   amount: Coin[];
-  gas: string;
+  gas: any;
 }
 
 export interface Message {
@@ -58,9 +60,29 @@ export interface Message {
 }
 
 export interface TxSignatureMeta {
-  accountNumber: string;
-  chainId: string;
+  account_number: string;
+  chain_id: string;
   sequence: string;
+}
+
+export interface TxDetails {
+  from: Bech32Address;
+  password: string;
+  pub_key?: HexEncoded;
+  fee?: StdFee;
+  memo?: string;
+}
+
+export interface BaseTx {
+  from: string;
+  account_number: string;
+  memo?: string;
+  chain_id: string;
+  sequence: string;
+  gas: string;
+  gas_adjustment: string;
+  fees: Coin;
+  simulate: boolean;
 }
 
 export interface StdMessageSignature extends TxSignatureMeta {
@@ -71,16 +93,16 @@ export interface StdMessageSignature extends TxSignatureMeta {
 
 export interface StdSignature {
   signature: any;
-  publicKey: any;
+  pub_key: any;
 }
 
-export interface Tx {
+export interface ITx {
   message: Message[];
   fee: StdFee;
   memo: string;
 }
 
-export interface StdTx extends Tx {
+export interface StdTx extends ITx {
   signatures?: StdSignature[];
 }
 
@@ -104,18 +126,27 @@ export interface KdfParams {
 export interface CipherParams {
   iv: string;
 }
-export interface Crypto {
-  ciphertext: string;
+export interface EncryptedPrivateKey {
+  ciphertext: HexEncoded;
   cipherparams: CipherParams;
   cipher: string;
   kdf: string;
   kdfparams: KdfParams;
-  mac: string;
+  mac: HexEncoded;
 }
 
 export interface EncryptedWallet {
-  version: number;
+  version?: number;
+  name: string;
   id: string;
+  publicKey: string;
   address: string;
-  crypto: Crypto;
+  crypto: EncryptedPrivateKey;
+}
+
+export interface TxMeta {
+  memo: string;
+  chainId: string;
+  accountNumber: string;
+  sequence: string;
 }
