@@ -1,3 +1,4 @@
+import {Buffer} from 'buffer/';
 import Long from 'long';
 
 import {sha256} from '../../cryptography/hashing.tools';
@@ -34,7 +35,7 @@ class TxBody {
     const msgs = this.messages.map(msg => {
       return GeneralTxTools.createAny(
         msg.type,
-        msg.protoBuffObject().serializeBinary()
+        msg.protobufObject().serializeBinary()
       );
     });
     body.setMessagesList(msgs);
@@ -129,9 +130,9 @@ export class TxRaw {
     });
     return tx.serializeBinary();
   };
-  async calculateTxHash(): Promise<HexEncoded> {
+  calculateTxHash(): HexEncoded {
     const txRaw = this.getRaw();
-    const hashed = await sha256(txRaw.serializeBinary());
+    const hashed = sha256(txRaw.serializeBinary());
     const hashedUpperCase = hashed.toString('hex').toUpperCase();
     return hashedUpperCase;
   }
@@ -142,11 +143,7 @@ export class TxFactory {
   addBody(messages: any[], memo?: string, timeout_height?: number) {
     this.body = new TxBody(messages, memo, timeout_height);
   }
-  addAuthInfo(
-    public_key: HexEncoded,
-    sequence: number,
-    fee: StdFee,
-  ) {
+  addAuthInfo(public_key: HexEncoded, sequence: number, fee: StdFee) {
     this.auth_info = new AuthInfo(public_key, sequence, fee);
   }
   buildTx(account_number) {
