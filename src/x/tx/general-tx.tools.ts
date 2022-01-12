@@ -1,3 +1,4 @@
+import {Buffer} from 'buffer/';
 import Long from 'long';
 
 import {HexEncoded, ProtoBufObject} from '../../types/aliases';
