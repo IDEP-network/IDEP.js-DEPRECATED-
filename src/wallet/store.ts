@@ -1,7 +1,5 @@
 import Keyv from 'keyv';
 
-import isNode from '../utils/is-node';
-
 export type WalletJson = any;
 export type StorageAdapter = any;
 
@@ -37,14 +35,24 @@ export class PersistentStorage {
 }
 
 const storageFactory = () => {
-  if (isNode) {
+  console.log(process.envType);
+  if (process.envType === 'browser') {
+    class PersistentLocalStorage {
+      get(name) {
+        const value = window.localStorage.getItem(name);
+        return JSON.parse(value);
+      }
+      set(name, value) {
+        window.localStorage.setItem(name, JSON.stringify(value));
+      }
+    }
+    return new PersistentStorage(new PersistentLocalStorage());
+  } else {
     const storage = new Keyv('sqlite://./db.sqlite', {
       serialize: JSON.stringify,
       deserialize: JSON.parse,
     });
     return new PersistentStorage(storage);
-  } else {
-    return new PersistentStorage(localStorage);
   }
 };
 
