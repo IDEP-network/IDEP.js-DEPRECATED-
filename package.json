@@ -3,7 +3,7 @@
   "version": "0.0.1-beta.1",
   "description": "IDEP javascript SDK",
   "author": "radekxrandom",
-  "private": true,
+  "private": false,
   "license": "MIT",
   "main": "dist/node/index.cjs.development.js",
   "browser": "dist/browser/index.js",
