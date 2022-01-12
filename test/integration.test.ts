@@ -1,9 +1,9 @@
-import Client, {ClientInterface} from '../src/client';
+import {ClientInterface, clientFactory} from '../src/client/client';
 
 describe('Client', () => {
   let client: ClientInterface;
   beforeAll(() => {
-    client = Client();
+    client = clientFactory();
   });
   describe('Wallet tests', () => {
     describe('Wallet can be createed, persisted, and retrieved', () => {
