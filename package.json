@@ -4,7 +4,7 @@
   "description": "IDEP javascript SDK",
   "author": "radekxrandom",
   "private": false,
-  "license": "MIT",
+  "license": "Apache-2.0",
   "main": "dist/node/index.cjs.development.js",
   "browser": "dist/browser/index.js",
   "typings": "dist/index.d.ts",
