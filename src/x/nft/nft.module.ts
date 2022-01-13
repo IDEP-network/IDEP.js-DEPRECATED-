@@ -1,5 +1,4 @@
 import {ClientInterface} from '../../client/client';
-import {Bech32Address, HexEncoded} from '../../types/aliases';
 import {
   MsgBurnNFT,
   MsgBurnNFTValue,
@@ -18,51 +17,31 @@ import {
   querySupplyRequest,
   TransferNftValue
 } from '../../types/nft-proto.types';
-import {StdFee, TxDetails} from '../../types/types';
+import {TxDetails} from '../../types/types';
 
 export class Nft {
   client: ClientInterface;
   constructor(client: ClientInterface) {
     this.client = client;
   }
-  async msgIssueDenom(
-    msgValue: MsgIssueDenomValue,
-    txDetails: TxDetails
-  ) {
+  async msgIssueDenom(msgValue: MsgIssueDenomValue, txDetails: TxDetails) {
     const msgs: any[] = [new MsgIssueDenom(msgValue)];
     return this.client.tx.buildSignSend(msgs, txDetails);
   }
-  async msgMintNFT(
-    msgValue: NFTParams,
-    txDetails: {
-      from: Bech32Address;
-      pub_key: HexEncoded;
-      fee?: StdFee | undefined;
-      memo?: string | 'No memes for you';
-    } // TODO note
-  ) {
+  async msgMintNFT(msgValue: NFTParams, txDetails: TxDetails) {
     const msgs: any[] = [new MsgMintNFT(msgValue)];
     return this.client.tx.buildSignSend(msgs, txDetails);
   }
-  async msgEditNFT(
-    msgValue: MsgEditNFTValue,
-    txDetails: TxDetails
-  ) {
+  async msgEditNFT(msgValue: MsgEditNFTValue, txDetails: TxDetails) {
     const msgs: any[] = [new MsgEditNFT(msgValue)];
     return this.client.tx.buildSignSend(msgs, txDetails);
   }
 
-  async msgTransferNFT(
-    msgValue: TransferNftValue,
-    txDetails: TxDetails
-  ) {
+  async msgTransferNFT(msgValue: TransferNftValue, txDetails: TxDetails) {
     const msgs: any[] = [new MsgTransferNFT(msgValue)];
     return this.client.tx.buildSignSend(msgs, txDetails);
   }
-  async msgBurnNFT(
-    msgValue: MsgBurnNFTValue,
-    txDetails: TxDetails
-  ) {
+  async msgBurnNFT(msgValue: MsgBurnNFTValue, txDetails: TxDetails) {
     const msgs: any[] = [new MsgBurnNFT(msgValue)];
     return this.client.tx.buildSignSend(msgs, txDetails);
   }
