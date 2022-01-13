@@ -212,3 +212,5 @@ const status = await client.rpc.checkTx(txHash);
 
 
 **Something doesn't work as expected?** Open a new issue!
+=======
+# IDEP.js
