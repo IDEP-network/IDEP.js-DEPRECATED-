@@ -16,7 +16,7 @@ export class Tx {
     const accountInfo = await this.client.auth.getAccountData(txDetails.from);
     const txFactory = new TxFactory();
     txFactory.addBody(msgs, txDetails.memo);
-    const publicKey = txDetails.pub_key || this.client.wallet.publicKey;
+    const publicKey = txDetails.publicKey || this.client.wallet.publicKey;
     const fee = isObjectEmpty(txDetails.fee) ? this.client.fee : txDetails.fee;
     console.log(fee);
     txFactory.addAuthInfo(publicKey, accountInfo.sequence, fee);
@@ -24,7 +24,7 @@ export class Tx {
     return txRaw;
   }
 
-  buildSignSend = async (msgs: any[], txDetails: any) => {
+  buildSignSend = async (msgs: any[], txDetails: TxDetails) => {
     const unsignedTxRaw = await this.createTxRaw(msgs, txDetails);
     const privateKey = await this.client.wallet.getPrivateKey(
       txDetails.password
@@ -35,7 +35,10 @@ export class Tx {
     );
     unsignedTxRaw.sign(signature);
     const readyForSending = unsignedTxRaw.getRaw();
-    return this.client.rpc.simulate(readyForSending.serializeBinary());
+    if (txDetails.simulate) {
+      return this.client.rpc.simulate(readyForSending.serializeBinary());
+    }
+    return this.client.rpc.send(readyForSending.serializeBinary());
   };
 
   async sign(signDoc: ProtoBufObject, priv_key: Uint8Array) {

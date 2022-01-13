@@ -37,7 +37,7 @@ export class Wallet {
     this.publicKey = publicKey;
     this.address = address;
     this.privateKey = crypto;
-    return wallet;
+    return { publicKey, address };
   }
 
   async storeWalletInMemory(
@@ -99,14 +99,14 @@ export class Wallet {
     );
     return { mnemonic, publicKey, address };
   }
-  async restoreFromSeed(
-    password: string,
-    mnemonic: string
+  async restoreWithSeed(
+    mnemonic: string,
+    password: string
   ): Promise<WalletDataForUser> {
     const wallet = await WalletTools.recoverFromMnemonics(mnemonic);
     return this.handleRestoredWallet(wallet, password);
   }
-  async restoreFromPrivateKey(
+  async restoreWithPrivateKey(
     privKey: HexEncoded,
     password: string
   ): Promise<WalletDataForUser> {

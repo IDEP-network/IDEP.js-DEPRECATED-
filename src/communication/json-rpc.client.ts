@@ -39,7 +39,7 @@ export class JsonRpc {
       : JSON.parse(Buffer.from(value, 'base64').toString());
     return decoded;
   }
-  async send(txBytes: ProtoBufObject, method: string = 'broadcast_tx_commit') {
+  async send(txBytes: ProtoBufObject, method: string = 'broadcast_tx_sync') {
     // TODO normalize return type
     const params: TxParams = {
       tx: Buffer.from(txBytes, 'binary').toString('base64'),
