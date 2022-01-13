@@ -1,4 +1,4 @@
-import {createNewClient, ClientInterface} from '../src/client/client';
+import {ClientInterface, createNewClient} from '../src/client/client';
 
 /**
  * @jest-environment jsdom
@@ -11,14 +11,14 @@ describe.skip('Client', () => {
   describe('Wallet tests', () => {
     describe('Wallet can be createed, persisted, and retrieved', () => {
       it('Create and persist wallet', async () => {
-        await client.wallet.createNew('encryptionPwd', 'optionalName');
+        await client.wallet.createNew('encryptionPwd', 'name');
         console.log(client.wallet);
         await client.wallet.persistWallet();
         // wallete name can bee provided wheen persisting one
         //await client.wallet.persistWallet('walletName');
       });
       it('Retrieve that wallet', async () => {
-        await client.wallet.retrieveSavedWallet('optionalName');
+        await client.wallet.retrieveSavedWallet('name');
         console.log(client.wallet);
       });
       it('Decrypt the private key', async () => {
@@ -51,9 +51,9 @@ describe.skip('Client', () => {
 
   describe('Restore from  mnemonic phrase and send MsgSend tx', () => {
     it('Restore from mnemonic phrase', async () => {
-      await client.wallet.restoreFromSeed(
-        'password',
-        'power thing inmate obscure rubber frequent grit hair below museum notable reopen spoon prize family caught axis host'
+      await client.wallet.restoreWithSeed(
+        'power thing inmate obscure rubber frequent grit hair below museum notable reopen spoon prize family caught axis host',
+        'password'
       );
       console.log(client.wallet);
     });
@@ -65,7 +65,7 @@ describe.skip('Client', () => {
         },
         {
           from: client.wallet.address,
-          pub_key: client.wallet.publicKey,
+          publicKey: client.wallet.publicKey,
           fee: {
             gas: '7000',
             amount: [{ denom: 'idep', amount: '700' }],

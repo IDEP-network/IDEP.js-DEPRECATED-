@@ -68,9 +68,10 @@ export interface TxSignatureMeta {
 export interface TxDetails {
   from: Bech32Address;
   password: string;
-  pub_key?: HexEncoded;
+  publicKey?: HexEncoded;
   fee?: StdFee;
   memo?: string;
+  simulate?: boolean;
 }
 
 export interface BaseTx {
