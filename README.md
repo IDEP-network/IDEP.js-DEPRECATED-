@@ -4,7 +4,7 @@
 
 ![chat](https://img.shields.io/discord/797223813480972289.svg)
 
-![IDEPJS](idepjsbanner.png?raw=true "Title")
+![IDEPJS](https://i.imgur.com/LJZpIbl.png "Title")
 
 ---
 ## Table of Contents
