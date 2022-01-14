@@ -1,1 +1,0 @@
-Manage accounts and signatures
