@@ -2,7 +2,7 @@ import {HttpClient} from '../communication/http.client';
 import {JsonRpc} from '../communication/json-rpc.client';
 import {RestClient, restClientFactory} from '../communication/rest-api.client';
 import {StdFee} from '../types/types';
-import {wallet, WalletInterface} from '../wallet/wallet';
+import {walletFactory, WalletInterface} from '../wallet/wallet';
 import {Auth} from '../x/auth/auth.module';
 import {Bank} from '../x/bank/bank.module';
 import {Nft} from '../x/nft/nft.module';
@@ -15,26 +15,20 @@ class Client {
   private _bank?: Bank;
   private _nft?: Nft;
   private _tx?: Tx;
-  nodeUrl: string;
-  chainId: string;
-  fee: StdFee;
+  clientConfig: ClientInstanceConfig;
   wallet: WalletInterface;
   constructor(
-    nodeUrl: string,
-    chainId: string,
-    fee: StdFee,
+    configuration: ClientInstanceConfig,
     rpcClient: JsonRpc,
     wallet: WalletInterface
   ) {
-    this.nodeUrl = nodeUrl;
-    this.chainId = chainId;
-    this.fee = fee;
+    this.clientConfig = configuration
     this.rpc = rpcClient;
     this.wallet = wallet;
   }
   get restClient(): RestClient {
     if (!this._restClient)
-      this._restClient = restClientFactory(`${this.nodeUrl.slice(0, -5)}1317`);
+      this._restClient = restClientFactory(`${this.clientConfig.nodeUrl.slice(0, -5)}1317`);
     return this._restClient;
   }
   get auth(): Auth {
@@ -61,12 +55,13 @@ export const createNewClient = (
   instanceConfig?: Partial<ClientInstanceConfig>
 ): Client => {
   console.log(process.envType);
-  const { nodeUrl, chainId, fee } = {
+  const configuration = {
     ...defaultClientConfig,
     ...instanceConfig,
   };
-  const rpcClient = new JsonRpc(HttpClient, nodeUrl);
-  const client: Client = new Client(nodeUrl, chainId, fee, rpcClient, wallet);
+  const wallet = walletFactory(configuration.hdPath, configuration.bech32Prefix);
+  const rpcClient = new JsonRpc(HttpClient, configuration.nodeUrl);
+  const client: Client = new Client(configuration, rpcClient, wallet);
   return client;
 };
 
@@ -74,6 +69,8 @@ interface ClientInstanceConfig {
   nodeUrl: string;
   chainId: string;
   fee: StdFee;
+  bech32Prefix: string;
+  hdPath: string;
 }
 
 const defaultClientConfig: ClientInstanceConfig = {
@@ -83,6 +80,8 @@ const defaultClientConfig: ClientInstanceConfig = {
     gas: '7000',
     amount: [{ denom: 'idep', amount: '500' }],
   },
+  bech32Prefix: 'idep',
+  hdPath: "m/44'/118'/0'/0/0",
 };
 //export default clientFactory;
 
