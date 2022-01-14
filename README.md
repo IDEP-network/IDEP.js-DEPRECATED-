@@ -1,16 +1,10 @@
-# IDEP.JS
-
-### Javascript library to facilitate and simplify interacting with the idep blockchain.
-
-![chat](https://img.shields.io/discord/797223813480972289.svg)
-
 ![IDEPJS](https://i.imgur.com/LJZpIbl.png "Title")
-
+IDEP.js is a javascript SDK that allows browsers and nodejs clients to interact with IDEP Network blockchain.  
 ---
 ## Table of Contents
 
 - [IDEP.JS](#idepjs)
-		- [Javascript library to facilitate and simplify interacting with the idep blockchain.](#javascript-library-to-facilitate-and-simplify-interacting-with-the-idep-blockchain)
+		- [Javascript library to facilitate and simplify interacting with the idep blockchain.](#javascript-library-to-facilitate-and-simplify-interacting-with-the-IDEP-blockchain)
 	- [Table of Contents](#table-of-contents)
 	- [Features](#features)
 	- [Installation](#installation)
@@ -70,9 +64,9 @@ const wallet = await client.wallet.createNew('encryptionPwd', 'walletName');
 
 ---
 
-# Using idep.js
+# Using IDEP.js
 
-## Idep.js client
+## IDEP.js client
 To start, import and create the client.
 ```typescript
 import {createNewClient} from 'idep.js';
@@ -208,9 +202,8 @@ const status = await client.rpc.checkTx(txHash);
 
 ## Appendix and FAQ
 
-**Got any questions?** Feel free to ask on our discord in idep.js channel!
+### ❓ More Questions?   
 
+Chat with the team on the [IDEP Discord server](https://discord.gg/Jrarctk4hG) IDEP.js channel!   
 
 **Something doesn't work as expected?** Open a new issue!
-=======
-# IDEP.js
