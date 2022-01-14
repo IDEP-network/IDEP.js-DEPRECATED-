@@ -13,3 +13,4 @@ docs/strategy.md
 .protolint.yaml
 scripts/protocgen.sh
 proto/buf.yaml
+/dist/
