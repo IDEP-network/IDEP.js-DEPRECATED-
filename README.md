@@ -1,8 +1,9 @@
 ![IDEPJS](https://i.imgur.com/LJZpIbl.png "Title")
 <p align="center">
-The JavaScript SDK for IDEP Network
+# The JavaScript SDK for IDEP Network
 </p>
 IDEP.js is a javascript SDK that allows browsers and nodejs clients to interact with IDEP Network blockchain.  
+
 ---
 ## Table of Contents
 
