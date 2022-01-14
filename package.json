@@ -1,8 +1,12 @@
 {
   "name": "idep.js",
-  "version": "0.0.1-beta.1",
+  "version": "0.0.1-beta.2",
   "description": "IDEP javascript SDK",
   "author": "radekxrandom",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/IDEP-network/IDEP.js.git"
+  },
   "private": false,
   "license": "Apache-2.0",
   "main": "dist/node/index.cjs.development.js",
