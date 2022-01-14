@@ -21,9 +21,13 @@ export class Wallet {
   privateKey: EncryptedPrivateKey;
   encryptionTool: CryptoStrategy;
   store: PersistentStorage;
-  constructor(encryptionTool: CryptoStrategy, store: PersistentStorage) {
+  bech32Prefix: string;
+  hdPath: string;
+  constructor(encryptionTool: CryptoStrategy, store: PersistentStorage, hdPath: string, bech32Prefix: string) {
     this.encryptionTool = encryptionTool;
     this.store = store;
+    this.hdPath = hdPath;
+    this.bech32Prefix = bech32Prefix;
   }
   async listSavedWallets(): Promise<string[]> {
     const storedWallets = await this.store.getSavedWallets();
@@ -68,7 +72,7 @@ export class Wallet {
     await this.store.saveWallet(encryptedWallet.name, encryptedWallet);
   }
   async createNew(password: string, name?: string): Promise<WalletDataForUser> {
-    const wallet = await WalletTools.generateWallet();
+    const wallet = await WalletTools.generateWallet(this.hdPath, this.bech32Prefix);
     const ramdomBytes = this.encryptionTool.getRandomBytes(12);
     const { privateKey, address, mnemonic } = wallet;
     const publicKeyRaw = wallet.publicKey;
@@ -103,14 +107,14 @@ export class Wallet {
     mnemonic: string,
     password: string
   ): Promise<WalletDataForUser> {
-    const wallet = await WalletTools.recoverFromMnemonics(mnemonic);
+    const wallet = await WalletTools.recoverFromMnemonics(mnemonic, this.hdPath, this.bech32Prefix);
     return this.handleRestoredWallet(wallet, password);
   }
   async restoreWithPrivateKey(
     privKey: HexEncoded,
     password: string
   ): Promise<WalletDataForUser> {
-    const wallet = await WalletTools.recoverFromPrivateKey(privKey);
+    const wallet = await WalletTools.recoverFromPrivateKey(privKey, this.bech32Prefix);
     return this.handleRestoredWallet(wallet, password);
   }
   async handleRestoredWallet(
@@ -168,10 +172,10 @@ export class Wallet {
   }
 }
 
-const walletFactory = () => {
-  const wallet = new Wallet(EncryptionTool, Store);
+export const walletFactory = (bech32Prefix: string, hdPath: string) => {
+  const wallet = new Wallet(EncryptionTool, Store, bech32Prefix, hdPath);
   return wallet;
 };
 
-export const wallet = walletFactory();
+//export const wallet = walletFactory();
 export interface WalletInterface extends Wallet {}

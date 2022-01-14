@@ -2,36 +2,38 @@ import {Bech32Address, HexEncoded} from '..';
 import * as walletCreationTool from './wallet.helper';
 
 export class WalletTools {
-  static async generateWallet(): Promise<WalletRaw> {
+  static async generateWallet(hdPath: string, bech32Prefix: string): Promise<WalletRaw> {
     const mnemonic = await walletCreationTool.generateMnemonic();
     const {
       privateKey,
       publicKey,
       address,
-    } = await WalletTools.generateFromSeed(mnemonic);
+    } = await WalletTools.generateFromSeed(mnemonic, hdPath, bech32Prefix);
     return { mnemonic, privateKey, publicKey, address };
   }
-  static async recoverFromMnemonics(mnemonic: string): Promise<WalletRaw> {
-    return WalletTools.generateFromSeed(mnemonic);
+  static async recoverFromMnemonics(mnemonic: string, hdPath: string, bech32Prefix: string): Promise<WalletRaw> {
+    return WalletTools.generateFromSeed(mnemonic, hdPath, bech32Prefix);
   }
-  static async generateFromSeed(mnemonic: string): Promise<WalletRaw> {
+  static async generateFromSeed(mnemonic: string, hdPath: string, bech32Prefix: string): Promise<WalletRaw> {
     const privateKey = await walletCreationTool.generatePrivateKeyFromMnemonic(
-      mnemonic
+      mnemonic,
+      hdPath
     );
     const publicKey = walletCreationTool.derivePublicKeyFromPrivateKey(
       privateKey
     );
-    const address = walletCreationTool.getAddressFromPublicKey(publicKey);
+    const address = walletCreationTool.getAddressFromPublicKey(publicKey, bech32Prefix);
     return { privateKey, publicKey, address };
   }
   static async recoverFromPrivateKey(
-    privateKeyHex: HexEncoded
+    privateKeyHex: HexEncoded,
+    bech32Prefix: string
   ): Promise<WalletRaw> {
     const privateKey = Buffer.from(privateKeyHex, 'hex');
     const publicKey = walletCreationTool.derivePublicKeyFromPrivateKey(
       privateKey
     );
-    const address = walletCreationTool.getAddressFromPublicKey(publicKey);
+    const address = walletCreationTool.getAddressFromPublicKey(publicKey, bech32Prefix);
     return { privateKey, publicKey, address };
   }
 }

@@ -4,7 +4,6 @@ import {BIP32Interface} from 'bip32';
 import {publicKeyCreate as secp256k1PublicKeyCreate} from 'secp256k1';
 
 import {ripemd160, sha256} from '../cryptography/hashing.tools';
-import {config} from '../utils/config';
 
 const bip32 = require('bip32') as typeof import('bip32');
 const bip39 = require('bip39') as typeof import('bip39');
@@ -25,7 +24,7 @@ if (process.envType === 'browser') {
 
 export const verifyAddress = (
   address: string,
-  prefix: string = config.Bech32Prefix
+  prefix: string = 'idep'
 ) => {
   const DECODED_ADDRESS_LENGTH = 20;
 
@@ -64,7 +63,7 @@ export const generateMasterKeyFromMnemonic = async (
 
 export const generatePrivateKeyFromMnemonic = async (
   mnemonic: string,
-  hdPath: string = config.hdPath
+  hdPath: string
 ): Promise<Buffer> => {
   const masterKey = await generateMasterKeyFromMnemonic(mnemonic);
 
@@ -78,17 +77,10 @@ export const derivePublicKeyFromPrivateKey = (privateKey: Buffer): Buffer => {
 
   return Buffer.from(publicKey);
 };
-export const encodeIntoBech32Format = (
-  hashedAddress: Buffer,
-  prefix: string = config.Bech32Prefix
-): string => {
-  const words = bech32.toWords(hashedAddress);
-  return bech32.encode(prefix, words);
-};
 
 export const getAddressFromPublicKey = (
   key: Buffer,
-  prefix: string = config.Bech32Prefix
+  prefix: string
 ): string => {
   const message = sha256(key);
   const hash = ripemd160(message);
@@ -98,7 +90,7 @@ export const getAddressFromPublicKey = (
 
 export const getAddressFromPrivateKey = (
   key: Buffer,
-  prefix: string = config.Bech32Prefix
+  prefix: string
 ): string => {
   return getAddressFromPublicKey(derivePublicKeyFromPrivateKey(key), prefix);
 };
