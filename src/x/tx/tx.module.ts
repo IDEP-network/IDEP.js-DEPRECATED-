@@ -17,8 +17,7 @@ export class Tx {
     const txFactory = new TxFactory();
     txFactory.addBody(msgs, txDetails.memo);
     const publicKey = txDetails.publicKey || this.client.wallet.publicKey;
-    const fee = isObjectEmpty(txDetails.fee) ? this.client.fee : txDetails.fee;
-    console.log(fee);
+    const fee = isObjectEmpty(txDetails.fee) ? this.client.clientConfig.fee : txDetails.fee;
     txFactory.addAuthInfo(publicKey, accountInfo.sequence, fee);
     const txRaw = txFactory.buildTx(accountInfo.accountNumber);
     return txRaw;
