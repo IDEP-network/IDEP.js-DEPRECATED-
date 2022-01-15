@@ -1,26 +1,27 @@
 {
   "name": "idep.js",
-  "version": "0.0.1-beta.2",
+  "version": "0.0.1-beta.5",
   "description": "IDEP javascript SDK",
   "author": "radekxrandom",
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/IDEP-network/IDEP.js.git"
+    "type": "git",
+    "url": "https://github.com/IDEP-network/IDEP.js.git"
   },
   "private": false,
   "license": "Apache-2.0",
   "main": "dist/node/index.cjs.development.js",
   "browser": "dist/browser/index.js",
-  "typings": "dist/index.d.ts",
+  "typings": "dist/types",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "node ./scripts/build.js && mkdir dist/node/proto-types && mkdir dist/browser/proto-types && cp -r src/types/proto-types/* dist/browser/proto-types && cp -r src/types/proto-types/* dist/node/proto-types && cp package.json dist/",
+    "build": "node ./scripts/build.js && mkdir dist/node/proto-types && mkdir dist/browser/proto-types && cp -r src/types/proto-types/* dist/browser/proto-types && cp -r src/types/proto-types/* dist/node/proto-types",
     "build:browser": "ENV_TYPE=browser tsdx build --target web --format esm --name index",
     "build:node": "ENV_TYPE=node tsdx build --target node --format cjs --name index",
     "test": "tsdx test",
-    "test-cov": "tsdx test  --coverage"
+    "test-cov": "tsdx test  --coverage",
+    "postinstall": "patch-package"
   },
   "prettier": {
     "printWidth": 80,
@@ -37,6 +38,7 @@
     "@types/jest": "^27.0.1",
     "@types/keyv": "^3.1.3",
     "@types/node": "^16.11.11",
+    "@types/readable-stream": "^2.3.9",
     "@types/ripemd160": "^2.0.0",
     "@types/ronomon__crypto-async": "^2.0.0",
     "@types/secp256k1": "^4.0.1",
@@ -70,6 +72,9 @@
     "keyv": "^4.0.4",
     "keyv-file": "^0.2.0",
     "long": "^5.2.0",
+    "patch-package": "^6.4.7",
+    "postinstall-postinstall": "^2.1.0",
+    "readable-stream": "^3.6.0",
     "ripemd160": "^2.0.2",
     "scrypt-pbkdf": "^1.0.7",
     "secp256k1": "^4.0.2",
