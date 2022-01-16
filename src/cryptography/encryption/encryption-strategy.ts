@@ -1,12 +1,25 @@
-import {WebCrypto} from './browser.strategy';
-import {CryptoStrategy} from './crypto-strategy.interface';
-import {NodeCrypto} from './node.strategy';
+import { WebCrypto } from './browser.strategy';
+import { CryptoStrategy } from './crypto-strategy.interface';
+import { NodeCrypto } from './node.strategy';
+
+declare global {
+  interface Window {
+    getRandom:<T>(array: T) => T;
+  }
+}
 
 const encryptionToolFactory = () => {
   if (process.envType === 'browser') {
     const crypto = window.crypto.subtle;
-    const getRandomBytes = window.crypto.getRandomValues;
-    return new WebCrypto(crypto, getRandomBytes);
+    window.getRandom = window.crypto.getRandomValues;
+    return new WebCrypto(crypto);
+  } else if (process.envType === 'react-native') {
+    const crypto = require('isomorphic-webcrypto');
+    (async () => {
+      await crypto.ensureSecure();
+      window.getRandom = crypto.getRandomValues;
+    })(); // 70% chancee it'll work
+    return new WebCrypto(crypto.subtle);
   } else {
     const crypto = require('crypto') as typeof import('crypto');
     return new NodeCrypto(crypto);

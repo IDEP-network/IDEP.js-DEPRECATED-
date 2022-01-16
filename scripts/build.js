@@ -28,6 +28,10 @@ proc.execSync('yarn build:browser');
 // so it doesn't get overwritten by next build step
 moveFile('dist', 'dist-browser');
 
+console.log('Building react native version...')
+proc.execSync('yarn build:react-native');
+moveFile('dist', 'dist-react-native');
+
 console.log('Building node version...')
 
 // running node build
@@ -55,6 +59,11 @@ fs.mkdirSync(path.resolve('dist', 'browser'));
 moveFile('dist-browser', 'dist/browser', 'index.js');
 moveFile('dist-browser', 'dist/browser', 'index.js.map');
 
+fs.mkdirSync(path.resolve('dist', 'react-native'));
+// moving the important files into 'dist/browser' folder
+moveFile('dist-react-native', 'dist/react-native', 'index.js');
+moveFile('dist-react-native', 'dist/react-native', 'index.js.map');
+
 // typings remain in the temporary folder
 // therefore we move and rename it to 'dist/types'
 moveFile('dist-browser', 'dist/types');
@@ -67,17 +76,26 @@ fs.copyFileSync(
 );
 fs.copyFileSync(
   path.resolve('templates', 'index.d.ts'),
+  path.resolve('dist', 'react-native', 'index.d.ts'),
+);
+fs.copyFileSync(
+  path.resolve('templates', 'index.d.ts'),
   path.resolve('dist', 'node', 'index.d.ts'),
 );
 
-var data = fs.readFileSync(path.resolve('dist', 'browser', 'index.js')).toString().split("\n");
+const addBuffrPolyfill = (environment) =>  {
+  var data = fs.readFileSync(path.resolve('dist', environment, 'index.js')).toString().split("\n");
 const dataToBeSearched = data.slice(0, 12);
 const match = dataToBeSearched.join('\n').match(/import { Buffer as (Buffer\$\d) } from 'buffer\/'/);
 data.splice(12, 0, `window.Buffer = ${match[1]}`);
 var text = data.join("\n");
 
-fs.writeFile(path.resolve('dist', 'browser', 'index.js'), text, function (err) {
+fs.writeFile(path.resolve('dist', environment, 'index.js'), text, function (err) {
   if (err) return console.log(err);
 });
+}
+
+addBuffrPolyfill('browser');
+addBuffrPolyfill('react-native');
 
 console.log('Build finished!');

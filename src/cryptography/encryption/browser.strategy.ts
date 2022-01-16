@@ -1,30 +1,29 @@
 import sha3 from 'js-sha3';
 import * as scryptPbkdf from 'scrypt-pbkdf';
 
-import {HexEncoded} from '../../types/aliases';
-import {EncryptedPrivateKey, KdfParams} from '../../types/types';
-import {getDefaultKdfParams} from '../../utils/default-kdf-params';
-import {CryptoStrategy} from './crypto-strategy.interface';
+import { HexEncoded } from '../../types/aliases';
+import { EncryptedPrivateKey, KdfParams } from '../../types/types';
+import { getDefaultKdfParams } from '../../utils/default-kdf-params';
+import { CryptoStrategy } from './crypto-strategy.interface';
 
 var Buffer = require('buffer/').Buffer;
+
 export class WebCrypto implements CryptoStrategy {
   precomputedHexOctets: string[];
-  getRandomValues: <T>(array: T) => T;
   subtle: SubtleCrypto;
 
-  constructor(subtle: SubtleCrypto, getRandomValues) {
+  constructor(subtle: SubtleCrypto) {
     this.precomputedHexOctets = [];
     this.subtle = subtle;
-    this.getRandomValues = getRandomValues;
     for (let n = 0; n <= 0xff; ++n) {
       const hexOctet: string = n.toString(16).padStart(2, '0');
       this.precomputedHexOctets.push(hexOctet);
     }
   }
-  getRandomBytes(length): Buffer {
-    const uintarr = window.crypto.getRandomValues(new Uint8Array(length));
+  getRandomBytes = (length): Buffer => {
+    const uintarr = window.getRandom(new Uint8Array(length));
     return Buffer.from(uintarr);
-  }
+  };
   async kdfMethod(
     password: string,
     salt: Uint8Array,
@@ -70,7 +69,7 @@ export class WebCrypto implements CryptoStrategy {
     }
 
     const octets = hexString.match(/[\dA-Fa-f]{2}/gi);
-    const decimalNumbers = octets.map(s => {
+    const decimalNumbers = octets.map((s) => {
       return parseInt(s, 16);
     });
 
@@ -83,7 +82,7 @@ export class WebCrypto implements CryptoStrategy {
     return this.bufferToHex(hashBuffer);
   }
   async importKey(key: ArrayBuffer): Promise<globalThis.CryptoKey> {
-    const imported = await window.crypto.subtle.importKey(
+    const imported = await this.subtle.importKey(
       'raw',
       key,
       {
@@ -111,7 +110,7 @@ export class WebCrypto implements CryptoStrategy {
   public async encrypt(msg: string, pwd: string): Promise<EncryptedPrivateKey> {
     const encoded = this.encodeMessage(msg);
     const kdfParams: KdfParams = getDefaultKdfParams();
-    const salt = this.getRandomBytes(16);
+    const salt = window.getRandom(new Uint8Array(16));
 
     const key: ArrayBuffer = await this.kdfMethod(
       pwd,
@@ -124,10 +123,10 @@ export class WebCrypto implements CryptoStrategy {
     kdfParams.salt = this.bufferToHex(salt.buffer);
     const webCryptoKey = await this.importKey(key);
     // counter will be needed for decryption
-    const nonce = window.crypto.getRandomValues(new Uint8Array(12));
+    const nonce =window.getRandom(new Uint8Array(12));
     let iv = new Uint8Array(16);
     iv.set(nonce);
-    const encrypted = await window.crypto.subtle.encrypt(
+    const encrypted = await this.subtle.encrypt(
       {
         name: 'AES-CTR',
         counter: iv,
@@ -164,7 +163,7 @@ export class WebCrypto implements CryptoStrategy {
     const webCryptoKey = await this.importKey(key);
     const iv = new Uint8Array(this.hexToBuffer(msg.cipherparams.iv));
     const text = new Uint8Array(this.hexToBuffer(msg.ciphertext));
-    const decrypted = await window.crypto.subtle.decrypt(
+    const decrypted = await this.subtle.decrypt(
       {
         name: 'AES-CTR',
         counter: iv,
