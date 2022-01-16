@@ -2,9 +2,11 @@
 <p align="center">
 The JavaScript SDK for IDEP Network
 </p>
-IDEP.js is a javascript SDK that allows browsers and nodejs clients to interact with IDEP Network blockchain.  
+IDEP.js is a javascript SDK that allows browsers and nodejs clients to interact with IDEP Network blockchain.   
+
 <p align="center">
   <img alt="lgtm" src="https://img.shields.io/lgtm/grade/javascript/g/IDEP-network/IDEP.js.svg?logo=lgtm&logoWidth=18">
+  <img alt="License" src="https://img.shields.io/badge/License-Apache_2.0-blue.svg">
 </p>
 ---
 ## Table of Contents
