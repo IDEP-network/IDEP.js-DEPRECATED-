@@ -1,4 +1,4 @@
-import Keyv from 'keyv';
+import Conf from 'conf';
 
 export type WalletJson = any;
 export type StorageAdapter = any;
@@ -48,10 +48,7 @@ const storageFactory = () => {
     }
     return new PersistentStorage(new PersistentLocalStorage());
   } else {
-    const storage = new Keyv('sqlite://./db.sqlite', {
-      serialize: JSON.stringify,
-      deserialize: JSON.parse,
-    });
+    const storage = new Conf({ encryptionKey: 'this isnt real security measure, its rather meant to make users less likely to edit the fiel' });
     return new PersistentStorage(storage);
   }
 };

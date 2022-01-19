@@ -3,7 +3,7 @@ import {ClientInterface, createNewClient} from '../src/client/client';
 /**
  * @jest-environment jsdom
  */
-describe.skip('Client', () => {
+describe('Client', () => {
   let client: ClientInterface;
   beforeAll(() => {
     client = createNewClient();
