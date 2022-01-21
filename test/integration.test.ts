@@ -25,6 +25,16 @@ describe('Client', () => {
         const key = await client.wallet.getPrivateKey('encryptionPwd');
         console.log(key);
       });
+      it('Check bip32, bip39, wallet generation', async () => {
+        const w = await client.wallet.restoreWithSeed(
+          'disorder suffer swing screen copy calm fork legal strategy until home ancient moment bench wet present sure vote match pluck peanut odor shoe monster',
+          'pindi'
+        );
+        console.log(client.wallet);
+        console.log(w);
+        expect(w.publicKey).toBe('ideppub1addwnpepqwdf3jg3u3j4y5nqj3qzx0y4fc3cccglql59sl7guc280fehntftct03e9c');
+        expect(w.address).toBe('idep1w574qn3yqgt0vsae3mut2upm9wjs5rzvw2y2h4');
+      });
     });
   });
   describe('Querying works', () => {
