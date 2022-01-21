@@ -12,6 +12,7 @@
     "baseUrl": ".",
     "outDir": "dist",
     "allowJs": true,
+    "resolveJsonModule": true,
     "checkJs": false,
     "lib": ["dom", "ESNext"],
     "importHelpers": true,
