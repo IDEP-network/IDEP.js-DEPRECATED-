@@ -1,4 +1,3 @@
-import Conf from 'conf';
 
 export type WalletJson = any;
 export type StorageAdapter = any;
@@ -48,6 +47,7 @@ const storageFactory = () => {
     }
     return new PersistentStorage(new PersistentLocalStorage());
   } else {
+    const Conf = require('conf');
     const storage = new Conf({ encryptionKey: 'this isnt real security measure, its rather meant to make users less likely to edit the fiel' });
     return new PersistentStorage(storage);
   }
