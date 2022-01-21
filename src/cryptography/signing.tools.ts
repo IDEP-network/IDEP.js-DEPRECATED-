@@ -7,7 +7,6 @@ import {sha256} from './hashing.tools';
 
 const secp256k1 = require('secp256k1') as typeof import('secp256k1');
 
-const tendermintBelt = require('@tendermint/belt') as typeof import('@tendermint/belt');
 interface KeyPair {
   pub_key: string;
   priv_key: string;
@@ -62,10 +61,10 @@ export class SigningTools {
     );
 
     return {
-      signature: tendermintBelt.bytesToBase64(signedMsgBytes),
+      signature: Buffer.from(signedMsgBytes).toString('base64'),
       pub_key: {
         type: 'tendermint/PubKeySecp256k1',
-        value: tendermintBelt.bytesToBase64(this.hexToBytes(pub_key)),
+        value: Buffer.from(pub_key).toString('base64'),
       },
     };
   };
@@ -73,7 +72,7 @@ export class SigningTools {
     signMsg,
     privateKey: Uint8Array
   ): Promise<Uint8Array> => {
-    const msgInBytesFormat = tendermintBelt.toCanonicalJSONBytes(signMsg);
+    const msgInBytesFormat = toCanonicalJSONBytes(signMsg);
     return await this.hashAndSignBytesWithPrivateKey(
       msgInBytesFormat,
       privateKey
@@ -89,17 +88,15 @@ export class SigningTools {
     return signature;
   };
   verifySignedBytes = async (signMsg, signature, pub_key): Promise<boolean> => {
-    const bytes = tendermintBelt.toCanonicalJSONBytes(signMsg);
+    const bytes = toCanonicalJSONBytes(signMsg);
     const hash = sha256(bytes);
     const uintArr = new Uint8Array(hash);
 
     return secp256k1.ecdsaVerify(signature, uintArr, pub_key);
   };
   verifySingleSignature = async (signMsg, signature): Promise<boolean> => {
-    const signedBytes = tendermintBelt.base64ToBytes(signature.signature);
-    const pub_key = tendermintBelt.base64ToBytes(
-      signature.pub_key?.value || signature.pub_key
-    );
+    const signedBytes = Buffer.from(signature.signature, 'base64');
+    const pub_key = Buffer.from(signature.pub_key?.value || signature.pub_key, 'base64');
 
     return await this.verifySignedBytes(signMsg, signedBytes, pub_key);
   };
@@ -117,6 +114,35 @@ export class SigningTools {
     return true;
   };
 }
+const toCanonicalJSONBytes = (value: any): Uint8Array => {
+  const canonicalJson = toCanonicalJSON(value);
+  const stringForm = JSON.stringify(canonicalJson);
+  return new Uint8Array(Buffer.from(stringForm));
+};
+
+const isObject = (obj) => {
+  return obj === Object(obj);
+};
+
+const toCanonicalJSON = (value: any) => {
+  if (isObject(value)) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sorted = {} as { [key: string]: any; };
+    const keys = Object.keys(value).sort();
+
+    for (const key of keys) {
+      sorted[key] = toCanonicalJSON(value[key]);
+    }
+
+    return sorted;
+  }
+
+  if (Array.isArray(value)) {
+    return value.map(toCanonicalJSON);
+  }
+
+  return (value === undefined) ? null : value;
+};
 
 const hexToBuffer = (hex: HexEncoded): ArrayBuffer => {
   const hexString = hex.replace(/^0x/, '');
