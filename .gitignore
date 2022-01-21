@@ -14,3 +14,10 @@ docs/strategy.md
 scripts/protocgen.sh
 proto/buf.yaml
 /dist/
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
