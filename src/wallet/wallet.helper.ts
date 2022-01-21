@@ -1,12 +1,9 @@
-import {bufferToBytes} from '@tendermint/belt';
 import {bech32} from 'bech32';
-import {BIP32Interface} from 'bip32';
 import {publicKeyCreate as secp256k1PublicKeyCreate} from 'secp256k1';
 
+import * as bip32 from '../bip32';
+import * as bip39 from '../bip39';
 import {ripemd160, sha256} from '../cryptography/hashing.tools';
-
-const bip32 = require('bip32') as typeof import('bip32');
-const bip39 = require('bip39') as typeof import('bip39');
 
 if (process.envType === 'browser') {
   var Buffer = require('buffer/').Buffer;
@@ -52,7 +49,7 @@ export const generateMnemonic = async (): Promise<string> => {
 
 export const generateMasterKeyFromMnemonic = async (
   mnemonic: string
-): Promise<BIP32Interface> => {
+): Promise<any> => {
   // throws if mnemonic is invalid
   // if (!bip39.validateMnemonic(mnemonic)) {
   //   throw new Error('Invalid mnemonic format'); // TO-DO custom error //type
@@ -67,12 +64,12 @@ export const generatePrivateKeyFromMnemonic = async (
 ): Promise<Buffer> => {
   const masterKey = await generateMasterKeyFromMnemonic(mnemonic);
 
-  const child: BIP32Interface = masterKey.derivePath(hdPath);
+  const child = await masterKey.derivePath(hdPath);
   return child.privateKey;
 };
 
 export const derivePublicKeyFromPrivateKey = (privateKey: Buffer): Buffer => {
-  const privateKeyBytes = bufferToBytes(privateKey);
+  const privateKeyBytes = new Uint8Array(privateKey);
   const publicKey = secp256k1PublicKeyCreate(privateKeyBytes, true);
 
   return Buffer.from(publicKey);
