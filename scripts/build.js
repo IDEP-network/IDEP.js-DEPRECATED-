@@ -13,13 +13,10 @@ const moveFile = (from, to, filename) => {
     to.push(filename);
   }
 
-  fs.renameSync(
-    path.resolve(...from),
-    path.resolve(...to),
-  )
-}
+  fs.renameSync(path.resolve(...from), path.resolve(...to));
+};
 
-console.log('Building browser version...')
+console.log('Building browser version...');
 
 // running browser build
 proc.execSync('yarn build:browser');
@@ -28,7 +25,7 @@ proc.execSync('yarn build:browser');
 // so it doesn't get overwritten by next build step
 moveFile('dist', 'dist-browser');
 
-console.log('Building node version...')
+console.log('Building node version...');
 
 // running node build
 proc.execSync('yarn build:node');
@@ -36,7 +33,7 @@ proc.execSync('yarn build:node');
 // create temporary folder 'dist-node' where we move our built node files
 fs.mkdirSync(path.resolve('dist-node'));
 
-console.log('Creating common types...')
+console.log('Creating common types...');
 moveFile('dist', 'dist-node', 'index.cjs.development.js');
 moveFile('dist', 'dist-node', 'index.cjs.development.js.map');
 moveFile('dist', 'dist-node', 'index.cjs.production.min.js');
@@ -63,20 +60,25 @@ moveFile('dist-browser', 'dist/types');
 // that's responsible for linking to folder 'dist/types'
 fs.copyFileSync(
   path.resolve('templates', 'index.d.ts'),
-  path.resolve('dist', 'browser', 'index.d.ts'),
+  path.resolve('dist', 'browser', 'index.d.ts')
 );
 fs.copyFileSync(
   path.resolve('templates', 'index.d.ts'),
-  path.resolve('dist', 'node', 'index.d.ts'),
+  path.resolve('dist', 'node', 'index.d.ts')
 );
 
-var data = fs.readFileSync(path.resolve('dist', 'browser', 'index.js')).toString().split("\n");
+var data = fs
+  .readFileSync(path.resolve('dist', 'browser', 'index.js'))
+  .toString()
+  .split('\n');
 const dataToBeSearched = data.slice(0, 12);
-const match = dataToBeSearched.join('\n').match(/import { Buffer as (Buffer\$\d) } from 'buffer\/'/);
+const match = dataToBeSearched
+  .join('\n')
+  .match(/import { Buffer as (Buffer\$\d) } from 'buffer\/'/);
 data.splice(12, 0, `window.Buffer = ${match[1]}`);
-var text = data.join("\n");
+var text = data.join('\n');
 
-fs.writeFile(path.resolve('dist', 'browser', 'index.js'), text, function (err) {
+fs.writeFile(path.resolve('dist', 'browser', 'index.js'), text, function(err) {
   if (err) return console.log(err);
 });
 
