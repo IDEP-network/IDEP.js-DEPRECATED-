@@ -60,7 +60,7 @@ export class Wallet {
     encryptedWallet?: EncryptedWallet
   ): Promise<void> {
     if (!encryptedWallet) {
-      const randomBytes = await this.encryptionTool.getRandomBytes(12);
+      const randomBytes = this.encryptionTool.getRandomBytes(12);
       encryptedWallet = {
         name: name || this.address,
         id: Buffer.from(randomBytes).toString('hex'),
@@ -153,7 +153,7 @@ export class Wallet {
     publicKey: HexEncoded,
     aminoPrefixHex: HexEncoded = 'EB5AE98721' // secp256k1 key type prefix
   ): Buffer {
-    const pubKeyBuffer = Buffer.from(publicKey);
+    const pubKeyBuffer = Buffer.from(publicKey, 'hex');
     const aminoPrefixBuffer = Buffer.from(aminoPrefixHex, 'hex');
     const combinedBuffers = Buffer.concat([aminoPrefixBuffer, pubKeyBuffer]);
     return combinedBuffers;
@@ -178,4 +178,4 @@ export const walletFactory = (bech32Prefix: string, hdPath: string) => {
 };
 
 //export const wallet = walletFactory();
-export interface WalletInterface extends Wallet {}
+export interface WalletInterface extends Wallet { }
