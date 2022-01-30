@@ -1,38 +1,42 @@
-![IDEPJS](https://i.imgur.com/LJZpIbl.png "Title")
-<p align="center">
+p![IDEPJS](https://i.imgur.com/LJZpIbl.png "Title")
+<h1 align="center">
 The JavaScript SDK for IDEP Network
-</p>
-IDEP.js is a javascript SDK that allows browsers and nodejs clients to interact with IDEP Network blockchain.    
-
+</h1>
 <p align="center">
-  <img alt="lgtm" src="https://img.shields.io/lgtm/grade/javascript/g/IDEP-network/IDEP.js.svg?logo=lgtm&logoWidth=18">
-  <img alt="License" src="https://img.shields.io/badge/License-Apache_2.0-blue.svg">
+IDEP.js is a javascript SDK that allows browsers and node.js clients to interact with IDEP Network blockchain.
+</p>
+<p align="center">
+  <a href="https://lgtm.com/projects/g/IDEP-network/IDEP.js/"><img alt="lgtm" src="https://img.shields.io/lgtm/grade/javascript/g/IDEP-network/IDEP.js.svg?logo=lgtm&logoWidth=18"></a>
+  <a href="https://github.com/IDEP-network/IDEP.js/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/License-Apache_2.0-blue.svg"></a>
+  <a href="https://github.com/IDEP-network/IDEP.js"><img alt="Last commit" src="https://badgen.net/github/last-commit/IDEP-network/IDEP.js/main"></a>
+  <a href="https://www.npmjs.com/package/idep.js"><img alt="Npm downloads" src="https://badgen.net/npm/dw/idep.js"></a>
+  <img alt="Beta release" src="https://badgen.net/github/release/idep-network/idep.js">
+  <img alt="Types included" src="https://badgen.net/npm/types/idep.js">
+  <a href="https://nodejs.org/en/blog/release/v16.13.2/"><img alt="Node version" src="https://badgen.net/npm/node/idep.js"></a>
+</p>
+<p align="center">
+<a href="https://nodei.co/npm/idep.js/"><img src="https://nodei.co/npm/idepjs.png"></a>
 </p>
 
 ----
 
 ## Table of Contents
 
-- [IDEP.JS](#idepjs)
-		- [Javascript library to facilitate and simplify interacting with the idep blockchain.](#javascript-library-to-facilitate-and-simplify-interacting-with-the-IDEP-blockchain)
-	- [Table of Contents](#table-of-contents)
-	- [Features](#features)
-	- [Installation](#installation)
-	- [Quick Start Guide](#quick-start-guide)
-- [Using idep.js](#using-idepjs)
-	- [Idep.js client](#idepjs-client)
-	- [Wallet](#wallet)
-		- [Create new wallet](#create-new-wallet)
-		- [Retrieving wallet from storage](#retrieving-wallet-from-storage)
-		- [Wallet restoration](#wallet-restoration)
-	- [Query the account's balance](#query-the-accounts-balance)
-	- [Create and send a simple transaction, that sends coins](#create-and-send-a-simple-transaction-that-sends-coins)
-		- [Check tx status](#check-tx-status)
+- [Using IDEP.js](#using-idepjs)
+  - [IDEP.js client](#idepjs-client)
+  - [Wallet](#wallet)
+    - [Create new wallet](#create-new-wallet)
+    - [Retrieving wallet from storage](#retrieving-wallet-from-storage)
+    - [Wallet restoration](#wallet-restoration)
+  - [Query the account's balance](#query-the-accounts-balance)
+  - [Create and send a simple transaction, that sends coins](#create-and-send-a-simple-transaction-that-sends-coins)
+    - [Check tx status](#check-tx-status)
 - [Possible queries and transactions](#possible-queries-and-transactions)
-		- [Auth src/x/auth](#auth-srcxauth)
-		- [Bank src/x/bank](#bank-srcxbank)
-		- [NFT src/x/nft](#nft-srcxnft)
-	- [Appendix and FAQ](#appendix-and-faq)
+    - [Auth src/x/auth](#auth-srcxauth)
+    - [Bank src/x/bank](#bank-srcxbank)
+    - [NFT src/x/nft](#nft-srcxnft)
+  - [Appendix and FAQ](#appendix-and-faq)
+    - [❓ More Questions?](#-more-questions)
 
 
 
@@ -75,6 +79,8 @@ const wallet = await client.wallet.createNew('encryptionPwd', 'walletName');
 ---
 
 # Using IDEP.js
+
+`Disclaimer: Using await in a global scope is only supported with node versions higher than 17. If using older versions, wrap examples below in async functions.`
 
 ## IDEP.js client
 To start, import and create the client.
@@ -212,8 +218,8 @@ const status = await client.rpc.checkTx(txHash);
 
 ## Appendix and FAQ
 
-### ❓ More Questions?   
+### ❓ More Questions?
 
-Chat with the team on the [IDEP Discord server](https://discord.gg/Jrarctk4hG) IDEP.js channel!   
+Chat with the team on the [IDEP Discord server](https://discord.gg/Jrarctk4hG) IDEP.js channel!
 
-**Something doesn't work as expected?** Open a new issue!
+**Something doesn't work as expected?** [Open a new issue!](https://github.com/IDEP-network/IDEP.js/issues)
