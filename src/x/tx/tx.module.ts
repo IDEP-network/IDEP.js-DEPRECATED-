@@ -1,5 +1,9 @@
-import {Buffer} from 'buffer/';
-
+//import {Buffer} from 'buffer/';
+if (process.envType === 'browser') {
+  var Buffer = require('buffer/').Buffer;
+} else {
+  var Buffer = require('buffer').Buffer;
+}
 import {ClientInterface} from '../../client/client';
 import {SigningTools} from '../../cryptography/signing.tools';
 import {HexEncoded, ProtoBufObject} from '../../types/aliases';

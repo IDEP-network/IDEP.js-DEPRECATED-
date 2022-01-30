@@ -1,9 +1,14 @@
 // credit to https://github.com/bitcoinjs/bip32
-//import {Buffer} from 'buffer/';
-import typeforce from 'typeforce';
+if (process.envType === 'browser') {
+	var Buffer = require('buffer/').Buffer;
+	window.Buffer = Buffer;
+} else {
+	var Buffer = require('buffer').Buffer;
+}
 
 import * as crypto from './crypto';
 import * as ecc from './tiny-secp256k1/code';
+
 
 interface Network {
 	wif: number;
@@ -17,14 +22,8 @@ interface Network {
 	scriptHash?: number;
 }
 
-const UINT256_TYPE = typeforce.BufferN(32);
-const NETWORK_TYPE = typeforce.compile({
-	wif: typeforce.UInt8,
-	bip32: {
-		public: typeforce.UInt32,
-		private: typeforce.UInt32,
-	},
-});
+
+
 
 const BITCOIN: Network = {
 	messagePrefix: '\x18Bitcoin Signed Message:\n',
@@ -38,17 +37,37 @@ const BITCOIN: Network = {
 	wif: 0x80,
 };
 
+const validateUInt32 = value => (value >>> 0) === value;
+
+const validateNetworkType = ({wif, bip32: {public: pub, private: priv}})  => {
+	if ((wif & 0xff) !== wif) throw new TypeError('Wif invalid');
+	if (!validateUInt32(pub)) throw new TypeError('Public key invalid');
+	if (!validateUInt32(priv)) throw new TypeError('Private key invalid');
+	return true;
+}
+
+const validatePrivateParts = (buffer: Buffer, length: number): boolean => {
+	if (Buffer.isBuffer(buffer) && buffer.length === length) {
+	return true;
+	}
+		throw new TypeError('Either not a buffer or invalid length');
+};
+
 const HIGHEST_BIT = 0x80000000;
 const UINT31_MAX = Math.pow(2, 31) - 1;
 
-function BIP32Path(value: string): boolean {
-	return (
-		typeforce.String(value) && value.match(/^(m\/)?(\d+'?\/)*\d+'?$/) !== null
-	);
+function validateBip32Path(value: string): boolean {
+if(value && value.match(/^(m\/)?(\d+'?\/)*\d+'?$/) !== null){
+	return true;
+}
+	throw new TypeError('BIP32 path invalid');
 }
 
-function UInt31(value: number): boolean {
-	return typeforce.UInt32(value) && value <= UINT31_MAX;
+function checkIfNumberIsUInt31(value: number): boolean {
+	if(validateUInt32(value) && value <= UINT31_MAX){
+		return true;
+	}
+	throw new TypeError('Invalid');
 }
 
 export interface BIP32Interface {
@@ -80,7 +99,7 @@ class BIP32 implements BIP32Interface {
 		private __INDEX = 0,
 		private __PARENT_FINGERPRINT = 0x00000000,
 	) {
-		typeforce(NETWORK_TYPE, network);
+		validateNetworkType(network);
 		this.lowR = false;
 	}
 
@@ -137,7 +156,7 @@ class BIP32 implements BIP32Interface {
 
 	// https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki#child-key-derivation-ckd-functions
 	async derive(index: number): Promise<BIP32Interface> {
-		typeforce(typeforce.UInt32, index);
+		if(!validateUInt32(index)) throw new TypeError('Invalid index');
 
 		const isHardened = index >= HIGHEST_BIT;
 		const data = Buffer.allocUnsafe(37);
@@ -208,14 +227,14 @@ class BIP32 implements BIP32Interface {
 	}
 
 	deriveHardened(index: number): Promise<BIP32Interface> {
-		typeforce(UInt31, index);
+		checkIfNumberIsUInt31(index);
 
 		// Only derives hardened private keys by default
 		return this.derive(index + HIGHEST_BIT);
 	}
 
 	async derivePath(path: string): Promise<BIP32Interface> {
-		typeforce(BIP32Path, path);
+		validateBip32Path(path);
 
 		let splitPath = path.split('/');
 		if (splitPath[0] === 'm') {
@@ -257,13 +276,8 @@ function fromPrivateKeyLocal(
 	index?: number,
 	parentFingerprint?: number,
 ): BIP32Interface {
-	typeforce(
-		{
-			privateKey: UINT256_TYPE,
-			chainCode: UINT256_TYPE,
-		},
-		{ privateKey, chainCode },
-	);
+	validatePrivateParts(privateKey, 32);
+	validatePrivateParts(chainCode, 32);
 	network = network || BITCOIN;
 
 	if (!ecc.isPrivate(privateKey))
@@ -295,13 +309,8 @@ function fromPublicKeyLocal(
 	index?: number,
 	parentFingerprint?: number,
 ): BIP32Interface {
-	typeforce(
-		{
-			publicKey: typeforce.BufferN(33),
-			chainCode: UINT256_TYPE,
-		},
-		{ publicKey, chainCode },
-	);
+		validatePrivateParts(publicKey, 33);
+		validatePrivateParts(chainCode, 32);
 	network = network || BITCOIN;
 
 	// verify the X coordinate is a point on the curve
@@ -318,7 +327,7 @@ function fromPublicKeyLocal(
 }
 
 export async function fromSeed(seed: Buffer, network?: Network): Promise<BIP32Interface> {
-	typeforce(typeforce.Buffer, seed);
+	if (!Buffer.isBuffer(seed)) throw new TypeError('Seed not buffer');
 	if (seed.length < 16) throw new TypeError('Seed should be at least 128 bits');
 	if (seed.length > 64) throw new TypeError('Seed should be at most 512 bits');
 	network = network || BITCOIN;

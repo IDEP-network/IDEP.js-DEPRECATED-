@@ -1,4 +1,9 @@
-import {Bech32Address, HexEncoded} from '..';
+if (process.envType === 'browser') {
+  var Buffer = require('buffer/').Buffer;
+} else {
+  var Buffer = require('buffer').Buffer;
+}
+import { Bech32Address, HexEncoded } from '..';
 import * as walletCreationTool from './wallet.helper';
 
 export class WalletTools {

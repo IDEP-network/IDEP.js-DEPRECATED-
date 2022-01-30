@@ -42,8 +42,8 @@ export class NodeCrypto implements CryptoStrategy {
   }
   public async encrypt(msg: string, pwd: string): Promise<EncryptedPrivateKey> {
     const kdfParams: KdfParams = getDefaultKdfParams();
-    const nonce: Buffer = await this.getRandomBytes(12);
-    const salt: Buffer = await this.getRandomBytes(16);
+    const nonce: Buffer = this.getRandomBytes(12);
+    const salt: Buffer = this.getRandomBytes(16);
     const key: Buffer = await this.kdfMethod(
       pwd,
       salt,

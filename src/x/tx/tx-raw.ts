@@ -1,4 +1,8 @@
-import {Buffer} from 'buffer/';
+if (process.envType === 'browser') {
+  var Buffer = require('buffer/').Buffer;
+} else {
+  var Buffer = require('buffer').Buffer;
+}
 import Long from 'long';
 
 import {sha256} from '../../cryptography/hashing.tools';

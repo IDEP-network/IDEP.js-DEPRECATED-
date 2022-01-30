@@ -1,4 +1,9 @@
-import {bech32} from 'bech32';
+if (process.envType === 'browser') {
+  var Buffer = require('buffer/').Buffer;
+} else {
+  var Buffer = require('buffer').Buffer;
+}
+import { bech32 } from 'bech32';
 import {publicKeyCreate as secp256k1PublicKeyCreate} from 'secp256k1';
 
 import * as bip32 from '../bip32';
@@ -6,13 +11,11 @@ import * as bip39 from '../bip39';
 import {ripemd160, sha256} from '../cryptography/hashing.tools';
 
 if (process.envType === 'browser') {
-  var Buffer = require('buffer/').Buffer;
   var getRandomBytes = (length: number): any => {
     const uintarr = window.crypto.getRandomValues(new Uint8Array(length));
     return Buffer.from(uintarr);
   };
 } else {
-  var Buffer = require('buffer/').Buffer;
   const crypto = require('crypto') as typeof import('crypto');
   var getRandomBytes = (length: number): any => {
     return crypto.randomBytes(length);

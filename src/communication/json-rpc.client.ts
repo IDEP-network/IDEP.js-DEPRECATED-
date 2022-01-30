@@ -1,6 +1,11 @@
 import {Base64Encoded, HexEncoded, ProtoBufObject, ProtoBufType} from '../types/aliases';
 import {HttpClient, HttpClientInterface} from './http.client';
 
+if (process.envType === 'browser') {
+  var Buffer = require('buffer/').Buffer;
+} else {
+  var Buffer = require('buffer').Buffer;
+}
 export class JsonRpc {
   url: string;
   http: HttpClientInterface;
@@ -25,7 +30,7 @@ export class JsonRpc {
     protoResponse?: ProtoBufType
   ) {
     const params: QueryParams = {
-      path, // remove emagic strings
+      path,
       data: Buffer.from(query.serializeBinary()).toString('hex'),
     };
     const response = await this.request('abci_query', params);

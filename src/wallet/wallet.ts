@@ -7,6 +7,11 @@ import {EncryptedPrivateKey, EncryptedWallet} from '../types/types';
 import {PersistentStorage, Store, WalletJson} from './store';
 import {WalletRaw, WalletTools} from './wallet.tools';
 
+if (process.envType === 'browser') {
+  var Buffer = require('buffer/').Buffer;
+} else {
+  var Buffer = require('buffer').Buffer;
+}
 interface WalletDataForUser {
   address: Bech32Address;
   publicKey: Bech32PublicKey;
@@ -35,9 +40,7 @@ export class Wallet {
   }
   async retrieveSavedWallet(name: string): Promise<WalletJson> {
     const wallet = await this.store.pickWallet(name);
-    const { address, crypto } = wallet;
-    // TODO obvious lol
-    const publicKey = wallet.pub_key || wallet.publicKey;
+    const { address, crypto, publicKey } = wallet;
     this.publicKey = publicKey;
     this.address = address;
     this.privateKey = crypto;
@@ -177,5 +180,4 @@ export const walletFactory = (bech32Prefix: string, hdPath: string) => {
   return wallet;
 };
 
-//export const wallet = walletFactory();
 export interface WalletInterface extends Wallet { }

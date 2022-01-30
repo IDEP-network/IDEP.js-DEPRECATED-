@@ -1,3 +1,4 @@
+export * from 'buffer/';
 export * from './client';
 export * from './x';
 export * from './communication';

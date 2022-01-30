@@ -10,7 +10,7 @@ const WORDLIST_REQUIRED =
 	'Please pass a 2048 word array explicitly.';
 
 if (process.envType !== 'browser') {
-	var Buffer = require('buffer/').Buffer;
+	var Buffer = require('buffer').Buffer;
 	const { pbkdf2: nodepbkdf2 } = require('crypto');
 	var pbkdf2 = (
 		password: Buffer,
@@ -128,7 +128,7 @@ export function entropyToMnemonic(
 		throw new TypeError(INVALID_ENTROPY);
 	}
 
-	const entropyBits = bytesToBinary([...entropy]);
+	const entropyBits = bytesToBinary(Array.from(entropy));
 	const checksumBits = deriveChecksumBits(entropy);
 
 	const bits = entropyBits + checksumBits;

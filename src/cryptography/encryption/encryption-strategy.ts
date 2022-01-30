@@ -1,6 +1,13 @@
-import {WebCrypto} from './browser.strategy';
-import {CryptoStrategy} from './crypto-strategy.interface';
-import {NodeCrypto} from './node.strategy';
+if (process.envType === 'browser') {
+  // eslint-disable-next-line no-unused-vars
+  var Buffer = require('buffer/').Buffer;
+} else {
+  // eslint-disable-next-line no-unused-vars
+  var Buffer = require('buffer').Buffer;
+}
+import { WebCrypto } from './browser.strategy';
+import { CryptoStrategy } from './crypto-strategy.interface';
+import { NodeCrypto } from './node.strategy';
 
 const encryptionToolFactory = () => {
   if (process.envType === 'browser') {

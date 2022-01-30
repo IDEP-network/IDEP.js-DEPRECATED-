@@ -1,3 +1,10 @@
+if (process.envType === 'browser') {
+   // eslint-disable-next-line no-unused-vars
+  var Buffer = require('buffer/').Buffer;
+} else {
+   // eslint-disable-next-line no-unused-vars
+  var Buffer = require('buffer').Buffer;
+}
 import {HttpClient} from '../communication/http.client';
 import {JsonRpc} from '../communication/json-rpc.client';
 import {RestClient, restClientFactory} from '../communication/rest-api.client';

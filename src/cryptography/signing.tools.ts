@@ -1,4 +1,8 @@
-import {Buffer} from 'buffer/';
+if (process.envType === 'browser') {
+  var Buffer = require('buffer/').Buffer;
+} else {
+  var Buffer = require('buffer').Buffer;
+}
 
 import {Base64Encoded, HexEncoded} from '../types/aliases';
 import {StdSignature} from '../types/types';

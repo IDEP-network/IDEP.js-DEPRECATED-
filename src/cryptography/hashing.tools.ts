@@ -1,3 +1,8 @@
+if (process.envType === 'browser') {
+  var Buffer = require('buffer/').Buffer;
+} else {
+  var Buffer = require('buffer').Buffer;
+}
 import RIPEMD160 from 'ripemd160';
 import shajs from 'sha.js';
 

@@ -1,5 +1,11 @@
 //import {Buffer} from 'buffer/';
-import {ripemd160, sha256} from '../cryptography/hashing.tools';
+if (process.envType === 'browser') {
+  var Buffer = require('buffer/').Buffer;
+} else {
+  var Buffer = require('buffer').Buffer;
+}
+import { ripemd160, sha256 } from '../cryptography/hashing.tools';
+
 
 
 if (process.envType !== 'browser') {
@@ -25,6 +31,7 @@ if (process.envType !== 'browser') {
     return Buffer.from(hmac);
   };
 }
+
 export const hash160 = (buffer) => {
   return Buffer.from(ripemd160(sha256(buffer)));
 };

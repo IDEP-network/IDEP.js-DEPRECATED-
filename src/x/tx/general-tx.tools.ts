@@ -1,9 +1,13 @@
-import {Buffer} from 'buffer/';
 import Long from 'long';
 
 import {HexEncoded, ProtoBufObject} from '../../types/aliases';
 import * as pbs from '../../types/proto';
 
+if (process.envType === 'browser') {
+  var Buffer = require('buffer/').Buffer;
+} else {
+  var Buffer = require('buffer').Buffer;
+}
 interface Coin {
   denom: string;
   amount: string;

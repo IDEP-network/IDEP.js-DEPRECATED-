@@ -1,5 +1,10 @@
 // credit to https://github.com/bitcoinjs/tiny-secp256k1
-import {Buffer} from 'buffer/';
+if (process.envType === 'browser') {
+	var Buffer = require('buffer/').Buffer;
+	window.Buffer = Buffer;
+} else {
+	var Buffer = require('buffer').Buffer;
+}
 
 const BN = require('bn.js');
 const EC = require('elliptic').ec;

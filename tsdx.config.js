@@ -8,9 +8,11 @@ module.exports = {
 
     if (envType) {
       config.plugins.push(
-        replace({ 'process.envType': `'${envType}'` }),
-        nodePolyfills({ include: null })
+        replace({ 'process.envType': `'${envType}'` })
       );
+      if(envType!=='node') {
+        config.plugins.push(nodePolyfills({ include: null }))
+      }
     }
     return config;
   },
