@@ -1,4 +1,4 @@
-p![IDEPJS](https://i.imgur.com/LJZpIbl.png "Title")
+![IDEPJS](https://i.imgur.com/LJZpIbl.png "Title")
 <h1 align="center">
 The JavaScript SDK for IDEP Network
 </h1>
