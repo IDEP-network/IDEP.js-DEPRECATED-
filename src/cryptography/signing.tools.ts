@@ -31,7 +31,7 @@ export class SigningTools {
     return { ...signMsg, signatures };
   };
 
-  verifyTx = (tx: StdSignMsg): boolean => {
+  verifyTx = (tx: StdSignMsg): Promise<boolean> => {
     const signMsg = this.createSignMsg(tx);
     return this.verifyTxSignatures(signMsg, tx.signatures);
   };
@@ -105,14 +105,14 @@ export class SigningTools {
     return await this.verifySignedBytes(signMsg, signedBytes, pub_key);
   };
 
-  verifyTxSignatures = (signMsg, signatures): boolean => {
+  verifyTxSignatures = async (signMsg, signatures): Promise<boolean> => {
     if (!signatures.length) {
       return false;
     }
-    for (let i = 0; i < signatures.length; i++) {
-      if (!this.verifySingleSignature(signMsg, signatures[i])) {
-        return false;
-      }
+    const promisedVerifications = signatures.map(signature => this.verifySingleSignature(signMsg, signature));
+    const verificationResults = await Promise.all(promisedVerifications);
+    if (verificationResults.indexOf(false) !== -1) {
+      return false;
     }
 
     return true;
