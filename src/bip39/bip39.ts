@@ -80,6 +80,8 @@ function binaryToByte(bin: string): number {
 }
 
 function bytesToBinary(bytes: number[]): string {
+	// each value in bytes (1 bit) encodes number from 0 to 255. 2^8 is 256, therefore afteere conveersion
+	// we pad with zeroes to ensure it takees up 8 characters so it adds up to one bit
 	return bytes.map((x: number): string => lpad(x.toString(2), '0', 8)).join('');
 }
 
@@ -118,13 +120,7 @@ export function entropyToMnemonic(
 	}
 
 	// 128 <= ENT <= 256
-	if (entropy.length < 16) {
-		throw new TypeError(INVALID_ENTROPY);
-	}
-	if (entropy.length > 32) {
-		throw new TypeError(INVALID_ENTROPY);
-	}
-	if (entropy.length % 4 !== 0) {
+	if (entropy.length < 16 || entropy.length > 32 ||	entropy.length % 4 !== 0) {
 		throw new TypeError(INVALID_ENTROPY);
 	}
 
