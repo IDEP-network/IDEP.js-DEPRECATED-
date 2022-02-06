@@ -16,9 +16,9 @@ const grpc = {};
 grpc.web = require('grpc-web');
 
 
-var gogoproto_gogo_pb = require('../../../gogoproto/gogo_pb.js')
+var gogoproto_gogo_pb = require('../../../gogoproto/gogo_pb.js');
 
-var cosmos_base_v1beta1_coin_pb = require('../../../cosmos/base/v1beta1/coin_pb.js')
+var cosmos_base_v1beta1_coin_pb = require('../../../cosmos/base/v1beta1/coin_pb.js');
 const proto = {};
 proto.cosmos = {};
 proto.cosmos.distribution = {};
@@ -397,4 +397,3 @@ proto.cosmos.distribution.v1beta1.MsgPromiseClient.prototype.fundCommunityPool =
 
 
 module.exports = proto.cosmos.distribution.v1beta1;
-

@@ -16,15 +16,15 @@ const grpc = {};
 grpc.web = require('grpc-web');
 
 
-var google_api_annotations_pb = require('../../../google/api/annotations_pb.js')
+var google_api_annotations_pb = require('../../../google/api/annotations_pb.js');
 
-var cosmos_base_abci_v1beta1_abci_pb = require('../../../cosmos/base/abci/v1beta1/abci_pb.js')
+var cosmos_base_abci_v1beta1_abci_pb = require('../../../cosmos/base/abci/v1beta1/abci_pb.js');
 
-var cosmos_tx_v1beta1_tx_pb = require('../../../cosmos/tx/v1beta1/tx_pb.js')
+var cosmos_tx_v1beta1_tx_pb = require('../../../cosmos/tx/v1beta1/tx_pb.js');
 
-var gogoproto_gogo_pb = require('../../../gogoproto/gogo_pb.js')
+var gogoproto_gogo_pb = require('../../../gogoproto/gogo_pb.js');
 
-var cosmos_base_query_v1beta1_pagination_pb = require('../../../cosmos/base/query/v1beta1/pagination_pb.js')
+var cosmos_base_query_v1beta1_pagination_pb = require('../../../cosmos/base/query/v1beta1/pagination_pb.js');
 const proto = {};
 proto.cosmos = {};
 proto.cosmos.tx = {};
@@ -403,4 +403,3 @@ proto.cosmos.tx.v1beta1.ServicePromiseClient.prototype.getTxsEvent =
 
 
 module.exports = proto.cosmos.tx.v1beta1;
-

@@ -16,17 +16,17 @@ const grpc = {};
 grpc.web = require('grpc-web');
 
 
-var gogoproto_gogo_pb = require('../../../../gogoproto/gogo_pb.js')
+var gogoproto_gogo_pb = require('../../../../gogoproto/gogo_pb.js');
 
-var cosmos_base_query_v1beta1_pagination_pb = require('../../../../cosmos/base/query/v1beta1/pagination_pb.js')
+var cosmos_base_query_v1beta1_pagination_pb = require('../../../../cosmos/base/query/v1beta1/pagination_pb.js');
 
-var ibc_core_client_v1_client_pb = require('../../../../ibc/core/client/v1/client_pb.js')
+var ibc_core_client_v1_client_pb = require('../../../../ibc/core/client/v1/client_pb.js');
 
-var ibc_core_connection_v1_connection_pb = require('../../../../ibc/core/connection/v1/connection_pb.js')
+var ibc_core_connection_v1_connection_pb = require('../../../../ibc/core/connection/v1/connection_pb.js');
 
-var google_api_annotations_pb = require('../../../../google/api/annotations_pb.js')
+var google_api_annotations_pb = require('../../../../google/api/annotations_pb.js');
 
-var google_protobuf_any_pb = require('google-protobuf/google/protobuf/any_pb.js')
+var google_protobuf_any_pb = require('google-protobuf/google/protobuf/any_pb.js');
 const proto = {};
 proto.ibc = {};
 proto.ibc.core = {};
@@ -486,4 +486,3 @@ proto.ibc.core.connection.v1.QueryPromiseClient.prototype.connectionConsensusSta
 
 
 module.exports = proto.ibc.core.connection.v1;
-

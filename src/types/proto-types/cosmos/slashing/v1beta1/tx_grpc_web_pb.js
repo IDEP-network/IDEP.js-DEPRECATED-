@@ -16,7 +16,7 @@ const grpc = {};
 grpc.web = require('grpc-web');
 
 
-var gogoproto_gogo_pb = require('../../../gogoproto/gogo_pb.js')
+var gogoproto_gogo_pb = require('../../../gogoproto/gogo_pb.js');
 const proto = {};
 proto.cosmos = {};
 proto.cosmos.slashing = {};
@@ -155,4 +155,3 @@ proto.cosmos.slashing.v1beta1.MsgPromiseClient.prototype.unjail =
 
 
 module.exports = proto.cosmos.slashing.v1beta1;
-

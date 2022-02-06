@@ -16,19 +16,19 @@ const grpc = {};
 grpc.web = require('grpc-web');
 
 
-var gogoproto_gogo_pb = require('../../../../gogoproto/gogo_pb.js')
+var gogoproto_gogo_pb = require('../../../../gogoproto/gogo_pb.js');
 
-var google_protobuf_any_pb = require('google-protobuf/google/protobuf/any_pb.js')
+var google_protobuf_any_pb = require('google-protobuf/google/protobuf/any_pb.js');
 
-var google_api_annotations_pb = require('../../../../google/api/annotations_pb.js')
+var google_api_annotations_pb = require('../../../../google/api/annotations_pb.js');
 
-var tendermint_p2p_types_pb = require('../../../../tendermint/p2p/types_pb.js')
+var tendermint_p2p_types_pb = require('../../../../tendermint/p2p/types_pb.js');
 
-var tendermint_types_block_pb = require('../../../../tendermint/types/block_pb.js')
+var tendermint_types_block_pb = require('../../../../tendermint/types/block_pb.js');
 
-var tendermint_types_types_pb = require('../../../../tendermint/types/types_pb.js')
+var tendermint_types_types_pb = require('../../../../tendermint/types/types_pb.js');
 
-var cosmos_base_query_v1beta1_pagination_pb = require('../../../../cosmos/base/query/v1beta1/pagination_pb.js')
+var cosmos_base_query_v1beta1_pagination_pb = require('../../../../cosmos/base/query/v1beta1/pagination_pb.js');
 const proto = {};
 proto.cosmos = {};
 proto.cosmos.base = {};
@@ -568,4 +568,3 @@ proto.cosmos.base.tendermint.v1beta1.ServicePromiseClient.prototype.getValidator
 
 
 module.exports = proto.cosmos.base.tendermint.v1beta1;
-

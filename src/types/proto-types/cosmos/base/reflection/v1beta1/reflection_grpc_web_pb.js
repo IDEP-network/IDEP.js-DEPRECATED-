@@ -16,7 +16,7 @@ const grpc = {};
 grpc.web = require('grpc-web');
 
 
-var google_api_annotations_pb = require('../../../../google/api/annotations_pb.js')
+var google_api_annotations_pb = require('../../../../google/api/annotations_pb.js');
 const proto = {};
 proto.cosmos = {};
 proto.cosmos.base = {};
@@ -236,4 +236,3 @@ proto.cosmos.base.reflection.v1beta1.ReflectionServicePromiseClient.prototype.li
 
 
 module.exports = proto.cosmos.base.reflection.v1beta1;
-

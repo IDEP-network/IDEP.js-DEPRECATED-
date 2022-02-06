@@ -16,11 +16,11 @@ const grpc = {};
 grpc.web = require('grpc-web');
 
 
-var google_protobuf_any_pb = require('google-protobuf/google/protobuf/any_pb.js')
+var google_protobuf_any_pb = require('google-protobuf/google/protobuf/any_pb.js');
 
-var google_api_annotations_pb = require('../../../google/api/annotations_pb.js')
+var google_api_annotations_pb = require('../../../google/api/annotations_pb.js');
 
-var cosmos_upgrade_v1beta1_upgrade_pb = require('../../../cosmos/upgrade/v1beta1/upgrade_pb.js')
+var cosmos_upgrade_v1beta1_upgrade_pb = require('../../../cosmos/upgrade/v1beta1/upgrade_pb.js');
 const proto = {};
 proto.cosmos = {};
 proto.cosmos.upgrade = {};
@@ -319,4 +319,3 @@ proto.cosmos.upgrade.v1beta1.QueryPromiseClient.prototype.upgradedConsensusState
 
 
 module.exports = proto.cosmos.upgrade.v1beta1;
-

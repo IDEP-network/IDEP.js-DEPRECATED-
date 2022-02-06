@@ -16,11 +16,11 @@ const grpc = {};
 grpc.web = require('grpc-web');
 
 
-var gogoproto_gogo_pb = require('../../../../gogoproto/gogo_pb.js')
+var gogoproto_gogo_pb = require('../../../../gogoproto/gogo_pb.js');
 
-var cosmos_base_v1beta1_coin_pb = require('../../../../cosmos/base/v1beta1/coin_pb.js')
+var cosmos_base_v1beta1_coin_pb = require('../../../../cosmos/base/v1beta1/coin_pb.js');
 
-var ibc_core_client_v1_client_pb = require('../../../../ibc/core/client/v1/client_pb.js')
+var ibc_core_client_v1_client_pb = require('../../../../ibc/core/client/v1/client_pb.js');
 const proto = {};
 proto.ibc = {};
 proto.ibc.applications = {};
@@ -160,4 +160,3 @@ proto.ibc.applications.transfer.v1.MsgPromiseClient.prototype.transfer =
 
 
 module.exports = proto.ibc.applications.transfer.v1;
-

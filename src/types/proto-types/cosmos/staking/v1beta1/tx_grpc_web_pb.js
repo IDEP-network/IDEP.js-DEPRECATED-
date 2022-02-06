@@ -16,17 +16,17 @@ const grpc = {};
 grpc.web = require('grpc-web');
 
 
-var google_protobuf_any_pb = require('google-protobuf/google/protobuf/any_pb.js')
+var google_protobuf_any_pb = require('google-protobuf/google/protobuf/any_pb.js');
 
-var google_protobuf_timestamp_pb = require('google-protobuf/google/protobuf/timestamp_pb.js')
+var google_protobuf_timestamp_pb = require('google-protobuf/google/protobuf/timestamp_pb.js');
 
-var gogoproto_gogo_pb = require('../../../gogoproto/gogo_pb.js')
+var gogoproto_gogo_pb = require('../../../gogoproto/gogo_pb.js');
 
-var cosmos_proto_cosmos_pb = require('../../../cosmos_proto/cosmos_pb.js')
+var cosmos_proto_cosmos_pb = require('../../../cosmos_proto/cosmos_pb.js');
 
-var cosmos_base_v1beta1_coin_pb = require('../../../cosmos/base/v1beta1/coin_pb.js')
+var cosmos_base_v1beta1_coin_pb = require('../../../cosmos/base/v1beta1/coin_pb.js');
 
-var cosmos_staking_v1beta1_staking_pb = require('../../../cosmos/staking/v1beta1/staking_pb.js')
+var cosmos_staking_v1beta1_staking_pb = require('../../../cosmos/staking/v1beta1/staking_pb.js');
 const proto = {};
 proto.cosmos = {};
 proto.cosmos.staking = {};
@@ -485,4 +485,3 @@ proto.cosmos.staking.v1beta1.MsgPromiseClient.prototype.undelegate =
 
 
 module.exports = proto.cosmos.staking.v1beta1;
-

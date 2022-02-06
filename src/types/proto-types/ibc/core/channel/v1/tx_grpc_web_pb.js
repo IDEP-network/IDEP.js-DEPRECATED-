@@ -16,11 +16,11 @@ const grpc = {};
 grpc.web = require('grpc-web');
 
 
-var gogoproto_gogo_pb = require('../../../../gogoproto/gogo_pb.js')
+var gogoproto_gogo_pb = require('../../../../gogoproto/gogo_pb.js');
 
-var ibc_core_client_v1_client_pb = require('../../../../ibc/core/client/v1/client_pb.js')
+var ibc_core_client_v1_client_pb = require('../../../../ibc/core/client/v1/client_pb.js');
 
-var ibc_core_channel_v1_channel_pb = require('../../../../ibc/core/channel/v1/channel_pb.js')
+var ibc_core_channel_v1_channel_pb = require('../../../../ibc/core/channel/v1/channel_pb.js');
 const proto = {};
 proto.ibc = {};
 proto.ibc.core = {};
@@ -880,4 +880,3 @@ proto.ibc.core.channel.v1.MsgPromiseClient.prototype.acknowledgement =
 
 
 module.exports = proto.ibc.core.channel.v1;
-

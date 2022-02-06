@@ -16,11 +16,11 @@ const grpc = {};
 grpc.web = require('grpc-web');
 
 
-var gogoproto_gogo_pb = require('../../../gogoproto/gogo_pb.js')
+var gogoproto_gogo_pb = require('../../../gogoproto/gogo_pb.js');
 
-var google_api_annotations_pb = require('../../../google/api/annotations_pb.js')
+var google_api_annotations_pb = require('../../../google/api/annotations_pb.js');
 
-var cosmos_params_v1beta1_params_pb = require('../../../cosmos/params/v1beta1/params_pb.js')
+var cosmos_params_v1beta1_params_pb = require('../../../cosmos/params/v1beta1/params_pb.js');
 const proto = {};
 proto.cosmos = {};
 proto.cosmos.params = {};
@@ -159,4 +159,3 @@ proto.cosmos.params.v1beta1.QueryPromiseClient.prototype.params =
 
 
 module.exports = proto.cosmos.params.v1beta1;
-

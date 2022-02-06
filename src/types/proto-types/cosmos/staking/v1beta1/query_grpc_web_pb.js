@@ -16,13 +16,13 @@ const grpc = {};
 grpc.web = require('grpc-web');
 
 
-var cosmos_base_query_v1beta1_pagination_pb = require('../../../cosmos/base/query/v1beta1/pagination_pb.js')
+var cosmos_base_query_v1beta1_pagination_pb = require('../../../cosmos/base/query/v1beta1/pagination_pb.js');
 
-var gogoproto_gogo_pb = require('../../../gogoproto/gogo_pb.js')
+var gogoproto_gogo_pb = require('../../../gogoproto/gogo_pb.js');
 
-var google_api_annotations_pb = require('../../../google/api/annotations_pb.js')
+var google_api_annotations_pb = require('../../../google/api/annotations_pb.js');
 
-var cosmos_staking_v1beta1_staking_pb = require('../../../cosmos/staking/v1beta1/staking_pb.js')
+var cosmos_staking_v1beta1_staking_pb = require('../../../cosmos/staking/v1beta1/staking_pb.js');
 const proto = {};
 proto.cosmos = {};
 proto.cosmos.staking = {};
@@ -1201,4 +1201,3 @@ proto.cosmos.staking.v1beta1.QueryPromiseClient.prototype.params =
 
 
 module.exports = proto.cosmos.staking.v1beta1;
-

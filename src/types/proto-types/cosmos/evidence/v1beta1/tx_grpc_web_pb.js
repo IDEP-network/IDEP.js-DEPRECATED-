@@ -16,11 +16,11 @@ const grpc = {};
 grpc.web = require('grpc-web');
 
 
-var gogoproto_gogo_pb = require('../../../gogoproto/gogo_pb.js')
+var gogoproto_gogo_pb = require('../../../gogoproto/gogo_pb.js');
 
-var google_protobuf_any_pb = require('google-protobuf/google/protobuf/any_pb.js')
+var google_protobuf_any_pb = require('google-protobuf/google/protobuf/any_pb.js');
 
-var cosmos_proto_cosmos_pb = require('../../../cosmos_proto/cosmos_pb.js')
+var cosmos_proto_cosmos_pb = require('../../../cosmos_proto/cosmos_pb.js');
 const proto = {};
 proto.cosmos = {};
 proto.cosmos.evidence = {};
@@ -159,4 +159,3 @@ proto.cosmos.evidence.v1beta1.MsgPromiseClient.prototype.submitEvidence =
 
 
 module.exports = proto.cosmos.evidence.v1beta1;
-

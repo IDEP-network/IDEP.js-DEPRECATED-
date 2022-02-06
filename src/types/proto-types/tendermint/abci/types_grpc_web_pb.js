@@ -16,17 +16,17 @@ const grpc = {};
 grpc.web = require('grpc-web');
 
 
-var tendermint_crypto_proof_pb = require('../../tendermint/crypto/proof_pb.js')
+var tendermint_crypto_proof_pb = require('../../tendermint/crypto/proof_pb.js');
 
-var tendermint_types_types_pb = require('../../tendermint/types/types_pb.js')
+var tendermint_types_types_pb = require('../../tendermint/types/types_pb.js');
 
-var tendermint_crypto_keys_pb = require('../../tendermint/crypto/keys_pb.js')
+var tendermint_crypto_keys_pb = require('../../tendermint/crypto/keys_pb.js');
 
-var tendermint_types_params_pb = require('../../tendermint/types/params_pb.js')
+var tendermint_types_params_pb = require('../../tendermint/types/params_pb.js');
 
-var google_protobuf_timestamp_pb = require('google-protobuf/google/protobuf/timestamp_pb.js')
+var google_protobuf_timestamp_pb = require('google-protobuf/google/protobuf/timestamp_pb.js');
 
-var gogoproto_gogo_pb = require('../../gogoproto/gogo_pb.js')
+var gogoproto_gogo_pb = require('../../gogoproto/gogo_pb.js');
 const proto = {};
 proto.tendermint = {};
 proto.tendermint.abci = require('./types_pb.js');
@@ -1284,4 +1284,3 @@ proto.tendermint.abci.ABCIApplicationPromiseClient.prototype.applySnapshotChunk 
 
 
 module.exports = proto.tendermint.abci;
-

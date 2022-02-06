@@ -16,15 +16,15 @@ const grpc = {};
 grpc.web = require('grpc-web');
 
 
-var cosmos_base_v1beta1_coin_pb = require('../../../cosmos/base/v1beta1/coin_pb.js')
+var cosmos_base_v1beta1_coin_pb = require('../../../cosmos/base/v1beta1/coin_pb.js');
 
-var cosmos_gov_v1beta1_gov_pb = require('../../../cosmos/gov/v1beta1/gov_pb.js')
+var cosmos_gov_v1beta1_gov_pb = require('../../../cosmos/gov/v1beta1/gov_pb.js');
 
-var cosmos_proto_cosmos_pb = require('../../../cosmos_proto/cosmos_pb.js')
+var cosmos_proto_cosmos_pb = require('../../../cosmos_proto/cosmos_pb.js');
 
-var gogoproto_gogo_pb = require('../../../gogoproto/gogo_pb.js')
+var gogoproto_gogo_pb = require('../../../gogoproto/gogo_pb.js');
 
-var google_protobuf_any_pb = require('google-protobuf/google/protobuf/any_pb.js')
+var google_protobuf_any_pb = require('google-protobuf/google/protobuf/any_pb.js');
 const proto = {};
 proto.cosmos = {};
 proto.cosmos.gov = {};
@@ -323,4 +323,3 @@ proto.cosmos.gov.v1beta1.MsgPromiseClient.prototype.deposit =
 
 
 module.exports = proto.cosmos.gov.v1beta1;
-

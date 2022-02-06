@@ -16,17 +16,17 @@ const grpc = {};
 grpc.web = require('grpc-web');
 
 
-var ibc_core_client_v1_client_pb = require('../../../../ibc/core/client/v1/client_pb.js')
+var ibc_core_client_v1_client_pb = require('../../../../ibc/core/client/v1/client_pb.js');
 
-var cosmos_base_query_v1beta1_pagination_pb = require('../../../../cosmos/base/query/v1beta1/pagination_pb.js')
+var cosmos_base_query_v1beta1_pagination_pb = require('../../../../cosmos/base/query/v1beta1/pagination_pb.js');
 
-var ibc_core_channel_v1_channel_pb = require('../../../../ibc/core/channel/v1/channel_pb.js')
+var ibc_core_channel_v1_channel_pb = require('../../../../ibc/core/channel/v1/channel_pb.js');
 
-var google_api_annotations_pb = require('../../../../google/api/annotations_pb.js')
+var google_api_annotations_pb = require('../../../../google/api/annotations_pb.js');
 
-var google_protobuf_any_pb = require('google-protobuf/google/protobuf/any_pb.js')
+var google_protobuf_any_pb = require('google-protobuf/google/protobuf/any_pb.js');
 
-var gogoproto_gogo_pb = require('../../../../gogoproto/gogo_pb.js')
+var gogoproto_gogo_pb = require('../../../../gogoproto/gogo_pb.js');
 const proto = {};
 proto.ibc = {};
 proto.ibc.core = {};
@@ -1126,4 +1126,3 @@ proto.ibc.core.channel.v1.QueryPromiseClient.prototype.nextSequenceReceive =
 
 
 module.exports = proto.ibc.core.channel.v1;
-

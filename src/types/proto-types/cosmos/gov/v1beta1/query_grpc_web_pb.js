@@ -16,13 +16,13 @@ const grpc = {};
 grpc.web = require('grpc-web');
 
 
-var cosmos_base_query_v1beta1_pagination_pb = require('../../../cosmos/base/query/v1beta1/pagination_pb.js')
+var cosmos_base_query_v1beta1_pagination_pb = require('../../../cosmos/base/query/v1beta1/pagination_pb.js');
 
-var gogoproto_gogo_pb = require('../../../gogoproto/gogo_pb.js')
+var gogoproto_gogo_pb = require('../../../gogoproto/gogo_pb.js');
 
-var google_api_annotations_pb = require('../../../google/api/annotations_pb.js')
+var google_api_annotations_pb = require('../../../google/api/annotations_pb.js');
 
-var cosmos_gov_v1beta1_gov_pb = require('../../../cosmos/gov/v1beta1/gov_pb.js')
+var cosmos_gov_v1beta1_gov_pb = require('../../../cosmos/gov/v1beta1/gov_pb.js');
 const proto = {};
 proto.cosmos = {};
 proto.cosmos.gov = {};
@@ -721,4 +721,3 @@ proto.cosmos.gov.v1beta1.QueryPromiseClient.prototype.tallyResult =
 
 
 module.exports = proto.cosmos.gov.v1beta1;
-
