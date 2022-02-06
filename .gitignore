@@ -21,3 +21,5 @@ proto/buf.yaml
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+.history/
+coverage/*
